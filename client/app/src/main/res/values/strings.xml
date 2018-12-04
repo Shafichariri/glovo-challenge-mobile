@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Challenge</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="open">Open</string>
+
+    <string name="dialog_positive_button_title">@string/open</string>
+    <string name="dialog_negative_button_title">@string/cancel</string>
+
+    <string name="dialog_location_permission_show_settings_title">Location Permission is needed!</string>
+    <string name="dialog_location_permission_show_settings_message">Please open the settings and enable the Location service.</string>
 </resources>
