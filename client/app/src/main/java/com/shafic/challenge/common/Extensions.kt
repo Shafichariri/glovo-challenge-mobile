@@ -7,6 +7,7 @@ import android.os.Looper
 import android.provider.Settings
 import android.support.annotation.StringRes
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Toast
 import android.widget.Toast.makeText
 import com.google.android.gms.maps.model.LatLng
@@ -28,6 +29,12 @@ fun AppCompatActivity.isOnMainThread(): Boolean {
 fun AppCompatActivity.settingsStarterIntent(): Intent {
     return Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
         .addCategory(Intent.CATEGORY_DEFAULT)
+}
+//endregion
+
+//region VIEW EXTENSION
+fun View.parentActivity(): AppCompatActivity? {
+    return this as? AppCompatActivity
 }
 //endregion
 

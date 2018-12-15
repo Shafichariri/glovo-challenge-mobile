@@ -6,6 +6,7 @@
         <domain includeSubdomains="true">10.0.2.2</domain>
         <!-- Add the Machine Specific IP to enable Running on Devices connected to the same WIFI -->
         <domain includeSubdomains="true">192.168.43.146</domain>
+        <domain includeSubdomains="true">192.168.2.220</domain>
         <!-- Also Update base_url dev.properties -->
     </domain-config>
 </network-security-config>

@@ -5,29 +5,29 @@ import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.PolyUtil
+import com.google.android.gms.maps.model.LatLngBounds
 import com.shafic.challenge.common.Optional
 import com.shafic.challenge.common.RxGeoCoder
 import com.shafic.challenge.common.base.BaseViewModel
 import com.shafic.challenge.common.util.MapUtil
-import com.shafic.challenge.common.util.MapUtil.Companion.isPolygonWithinBounds
 import com.shafic.challenge.data.api.CitiesService
 import com.shafic.challenge.data.models.City
-import com.shafic.challenge.data.presentation.MapDataPresentation
-import com.shafic.challenge.data.presentation.RegionInfo
-import com.shafic.challenge.data.presentation.SimpleCity
-import com.shafic.challenge.data.presentation.ZoomContext
+import com.shafic.challenge.data.presentation.*
+import com.shafic.challenge.managers.CityManager
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.ReplaySubject
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
 class MainActivityViewModel : BaseViewModel() {
+    data class LocationChangeData(val latLng: LatLng, val provider: RxGeoCoder.LocationInformationInterface)
 
     @Inject
     lateinit var citiesApi: CitiesService
@@ -36,14 +36,17 @@ class MainActivityViewModel : BaseViewModel() {
     private lateinit var readinessSubscription: Disposable
     private lateinit var regionSubscription: Disposable
     private var locationDetailsSubscription: Disposable? = null
+    private var locationChangedSubscription: Disposable? = null
 
     val readyLiveData: MutableLiveData<Boolean> = MutableLiveData()
     val mapData: MutableLiveData<MapDataPresentation> = MutableLiveData()
-    //val mapData: MutableLiveData<MapDataPresentation> = MutableLiveData()
+    val isServiceable: MutableLiveData<Boolean> = MutableLiveData()
+    val activeLocationInfo: MutableLiveData<ServiceableLocation.Serviceable?> = MutableLiveData()
 
-    private val areasReadyObservable: BehaviorSubject<Boolean> = BehaviorSubject.create()
+    private val areasReadyObservable: ReplaySubject<Boolean> = ReplaySubject.create()
     private val mapReadyObservable: PublishSubject<Boolean> = PublishSubject.create()
     private val regionSubject: PublishSubject<RegionInfo> = PublishSubject.create()
+    private val locationChangedSubject: PublishSubject<LocationChangeData> = PublishSubject.create()
 
     private var decodedCities: List<SimpleCity> = arrayListOf()
     private var cities: MutableList<City> = arrayListOf()
@@ -52,6 +55,7 @@ class MainActivityViewModel : BaseViewModel() {
         setupReadinessObservable()
         setupVisibleRegionChangedObservable()
         loadCities()
+        setupLocationChangedObservable()
     }
 
     override fun onCleared() {
@@ -59,41 +63,111 @@ class MainActivityViewModel : BaseViewModel() {
         subscription.dispose()
         readinessSubscription.dispose()
         locationDetailsSubscription?.dispose()
+        locationChangedSubscription?.dispose()
     }
 
-    fun requestLocationDetails(latlng: LatLng, provider: RxGeoCoder.LocationInformationInterface) {
-        val locationDetailsObserver = RxGeoCoder.locationDetails(latLng = latlng, provider = provider)
+    fun polygonBounds(code: String?, path: String?): LatLngBounds? {
+        if (code == null || code.count() != 3 || path == null) {
+            //Path or Country code are not valid
+            return null
+        }
+        val polygon = MapUtil.decodePolygon(path)
+        return MapUtil.createLatLngsBounds(polygon)
+    }
 
-        Observable
-            .zip<RxGeoCoder.Result, Boolean, Pair<RxGeoCoder.Result, Boolean>>(locationDetailsObserver.toObservable(),
+    fun cityBounds(code: String): LatLngBounds? {
+        if (code.count() != 3) {
+            //Country code is not valid
+            return null
+        }
+        val city = decodedCities.filter { it.code == code }.first()
+        val workingAreas = city.workingArea?.flatten() ?: return null
+        return MapUtil.createLatLngsBounds(workingAreas)
+
+    }
+
+    fun requestLocationDetails(latLng: LatLng, provider: RxGeoCoder.LocationInformationInterface) {
+        locationChangedSubject.onNext(LocationChangeData(latLng, provider))
+    }
+
+    private fun setupLocationChangedObservable() {
+        locationChangedSubscription = locationChangedSubject
+            .debounce(300, TimeUnit.MILLISECONDS)
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                fetchLocationDetails(it.latLng, it.provider)
+            }, {
+                it.printStackTrace()
+            })
+    }
+
+    private fun fetchLocationDetails(latlng: LatLng, provider: RxGeoCoder.LocationInformationInterface) {
+        val locationDetailsObserver = RxGeoCoder.locationDetails(latLng = latlng, provider = provider).toObservable()
+
+        locationDetailsSubscription = Observable
+            .zip<RxGeoCoder.Result, Boolean, Pair<RxGeoCoder.Result, Boolean>>(locationDetailsObserver,
                 areasReadyObservable, BiFunction { result, areasLoaded ->
+                    Log.e("SHAFIC", "combineLatest $areasLoaded ${result.locationInformation?.city}")
                     return@BiFunction Pair(result, areasLoaded)
                 })
             .subscribeOn(Schedulers.io())
             .filter { it.second }
+            .flatMap { pair ->
+                return@flatMap serviceMapper(pair.first, decodedCities)
+            }
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnEach { }
+            .doOnNext { serviceableLocation ->
+                when (serviceableLocation) {
+                    is ServiceableLocation.Serviceable -> {
+                        //TODO: ServiceableLocationInformation
+                        Log.e("SHAFIC", "Serviceable || ${serviceableLocation.city}")
+                        isServiceable.value = true
+                        activeLocationInfo.value = serviceableLocation
+                    }
+                    is ServiceableLocation.NotServiceable -> {
+                        //TODO: Not Serviceable
+                        Log.e("SHAFIC", "Not Serviceable")
+                        isServiceable.value = false
+                        activeLocationInfo.value = null
+                    }
+                    is ServiceableLocation.Error -> {
+                        //TODO: Handle Error
+                        Log.e("SHAFIC", serviceableLocation.result.error?.description)
+                    }
+                }
+            }
+            .subscribe({ }, { throwable ->
+                throwable?.printStackTrace()
+            })
+    }
 
+    private fun serviceMapper(
+        result: RxGeoCoder.Result, cities: List<SimpleCity>
+    ): Observable<ServiceableLocation> {
+        val info = result.locationInformation ?: return Observable.just(ServiceableLocation.Error(result = result))
 
-//        locationDetailsObserver.zipWith(areasReadyObservable, {
-//            
-//        })
-//        locationDetailsSubscription = RxGeoCoder.locationDetails(latLng = latlng, provider = provider)
-//            .subscribe({ result ->
-//                val error = result.error
-//                val locationInfo = result.locationInformation
-//
-//                if (locationInfo != null) {
-//                    Log.e("SHAFIC", locationInfo.toString())
-//                } else if (error != null) {
-//                    //TODO: Handle error
-//                    Log.e("SHAFIC", error.description)
-//                } else {
-//                    throw Exception("Should never be here")
-//                }
-//            }, {
-//                it.printStackTrace()
-//            })
+        val countryCode = info.country.code
+        val cities = CityManager.filterBy(latLng = info.latLng, andCountryCode = countryCode, list = cities)
+
+        val serviceableLocation = ServiceableLocation.NotServiceable(cities?.firstOrNull(), result = result)
+        val cityCode = serviceableLocation.cityCode ?: return Observable.just(serviceableLocation)
+        val thoroughfare = serviceableLocation.result?.locationInformation?.thoroughfare
+
+        return getCityByCode(code = cityCode)
+            .toObservable()
+            .subscribeOn(Schedulers.io())
+            .map {
+                val city = it //?: return@map ServiceableLocation.Error(result = result)
+                return@map ServiceableLocation.Serviceable(
+                    city = city,
+                    thoroughfare = thoroughfare
+                )
+            }
+    }
+
+    private fun getCityByCode(code: String): Maybe<City> {
+        return citiesApi.get(code = code)
     }
 
     private fun setupReadinessObservable() {
@@ -104,7 +178,6 @@ class MainActivityViewModel : BaseViewModel() {
                 areasReadyObservable,
                 mapReadyObservable,
                 BiFunction { areasReady, mapReady ->
-                    log("readinessSubscription $areasReady $mapReady")
                     return@BiFunction areasReady && mapReady
                 })
             .subscribeOn(Schedulers.io())
@@ -122,7 +195,6 @@ class MainActivityViewModel : BaseViewModel() {
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                log("subscribe || setupVisibleRegionChangedObservable")
                 handleMapRepresentedData(it)
             }, {
                 log("Error || setupVisibleRegionChangedObservable")
@@ -144,60 +216,28 @@ class MainActivityViewModel : BaseViewModel() {
         val zoomContext = ZoomContext.create(info.zoom)
 
         when (zoomContext) {
-            ZoomContext.MarkersClusterFriendly -> {
-                //Represent each cities once on this zoom level 
-                val citiesLngLat = decodedCities.distinctBy { it.code }
-                    .filterNot { it.latLng == null }
-
-                return Optional(
-                    MapDataPresentation
-                        .create(zoomContext, cityMarkers = citiesLngLat)
-                )
-            }
             ZoomContext.MarkersFriendly -> {
-                log("ZoomContext: MarkersFriendly ")
-
-                val visibleBounds = info.visibleRegionPolygon ?: return Optional.empty()
-                var boundedMarkers: MutableList<SimpleCity> = mutableListOf()
-
-                val simpleCities = decodedCities.toList()
-                simpleCities.forEach { city ->
-                    val anyCityMarker = city.latLng// ?: return@forEach
-                    if (anyCityMarker != null &&
-                        MapUtil.isPointWithinBounds(visibleBounds, anyCityMarker, true)
-                    ) {
-                        boundedMarkers.add(city)
-                    }
-                }
+                //Represent each cities once on this zoom level
+                val cities = CityManager.filterByAproxCenter(
+                    list = decodedCities.toList(),
+                    withinBounds = info.visibleRegionPolygon
+                )
 
                 return Optional(
                     MapDataPresentation
-                        .create(zoomContext, cityMarkers = boundedMarkers)
+                        .create(zoomContext, cityMarkers = cities)
                 )
             }
+            ZoomContext.PolygonsFriendly -> {
 
-            ZoomContext.PolygonsClusterFriendly, ZoomContext.PolygonsFriendly -> {
-                log("ZoomContext: PolygonsClusterFriendly || PolygonsFriendly ")
-
-                val visibleBounds = info.visibleRegionPolygon ?: return Optional.empty()
-                val simpleCities = decodedCities.toList()
-
-                val cityAreasWithinBounds = simpleCities.mapNotNull { city ->
-                    var areas = arrayListOf<List<LatLng>>()
-                    city.workingArea?.forEach { area ->
-                        if (isPolygonWithinBounds(visibleBounds, area)) {
-                            areas.add(area)
-                        }
-                    }
-                    if (areas.isEmpty()) {
-                        return@mapNotNull null
-                    }
-                    return@mapNotNull SimpleCity(city.code, latLng = city.latLng, workingArea = areas)
-                }
+                val cities = CityManager.filterByWorkingAreas(
+                    list = decodedCities.toList(),
+                    withinBounds = info.visibleRegionPolygon
+                )
 
                 return Optional(
                     MapDataPresentation
-                        .create(zoomContext, cityMarkers = cityAreasWithinBounds)
+                        .create(zoomContext, cityMarkers = cities)
                 )
             }
 
@@ -218,22 +258,10 @@ class MainActivityViewModel : BaseViewModel() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess { cities ->
-                this.cities = cities.toMutableList()
-
-                decodedCities = cities.map {
-                    val workingArea = it.workingArea.map { encodedPolygon -> PolyUtil.decode(encodedPolygon) }
-                    return@map SimpleCity(
-                        it.code,
-                        latLng = workingArea.firstOrNull()?.firstOrNull(),
-                        workingArea = workingArea
-                    )
-                }
-                log("loadCities || success")
+                this.cities = cities.toMutableList()// ?: return@doOnSuccess
+                this.decodedCities = CityManager.convertToDecodedCities(this.cities)
             }
-            .subscribe(
-                { onRetrieveCitiesSuccess() },
-                { onRetrieveCitiesError(it) }
-            )
+            .subscribe({ onRetrieveCitiesSuccess() }, { onRetrieveCitiesError(it) })
     }
 
     private fun onRetrieveCitiesSuccess() {
@@ -246,20 +274,23 @@ class MainActivityViewModel : BaseViewModel() {
         throwable.printStackTrace()
     }
 
-    fun log(message: String = "", info: Boolean = false) {
+    fun log(message: String = "EMPTY_LOG") {
         if (!message.isBlank()) {
             Log.d("SHAFIC", "LOGGER: $message")
-        }
-        if (info) {
-            Log.d("SHAFIC", "Cities: ${cities.count()}")
         }
     }
 
     fun requestMapDisplayInfo(zoom: Float, center: LatLng, visibleRegionPolygon: List<LatLng>?) {
         val regionInfo = RegionInfo(zoom, center, visibleRegionPolygon)
-        log("(requestMapDisplayInfo) regionInfo: $regionInfo", info = true)
-
+        log("zoom: $zoom")
         regionSubject.onNext(regionInfo)
+    }
+
+    fun shouldCheckIfLocationIsServiceable(zoom: Float): Boolean {
+        return when (ZoomContext.create(zoom = zoom)) {
+            ZoomContext.PolygonsFriendly -> true
+            else -> false
+        }
     }
 }
 

@@ -16,6 +16,9 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    dataBinding {
+        enabled = true
+    }
     signingConfigs {
         debug {
             storeFile rootProject.file('debug.keystore')
@@ -66,6 +69,7 @@ dependencies {
     implementation "com.android.support:support-v4:$androidSupportVersion"
     implementation "com.android.support:animated-vector-drawable:$androidSupportVersion"
     implementation "com.android.support:support-media-compat:$androidSupportVersion"
+    implementation "com.android.support:recyclerview-v7:$androidSupportVersion"
     
     
     //Dagger 
@@ -106,6 +110,7 @@ dependencies {
     //RxJava Retrofit plugins
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-java8:$retrofitVersion"
     
     //ReactiveX Implementation
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'

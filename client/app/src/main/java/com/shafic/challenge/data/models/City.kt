@@ -32,3 +32,9 @@ data class City(
         return Arrays.hashCode(workingArea)
     }
 }
+
+
+
+fun City.id(): String {
+    return "$code-$countryCode"
+}

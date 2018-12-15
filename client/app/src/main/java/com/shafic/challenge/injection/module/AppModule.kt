@@ -16,6 +16,8 @@ internal interface AppComponent : AndroidInjector<ChallengeApplication> {
 
     @Component.Builder
     abstract class Builder : AndroidInjector.Builder<ChallengeApplication>()
+
+    fun build(): AppComponent
 }
 
 @Module(includes = [AndroidInjectionModule::class])

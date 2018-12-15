@@ -2,6 +2,7 @@ package com.shafic.challenge.injection.module
 
 import com.google.gson.GsonBuilder
 import com.shafic.challenge.data.api.CitiesService
+import com.shafic.challenge.data.api.CountriesService
 import com.shafic.newassignment.network.NetworkConstants
 import dagger.Module
 import dagger.Provides
@@ -28,6 +29,18 @@ object NetworkModule {
     @JvmStatic
     internal fun provideCitiesApi(retrofit: Retrofit): CitiesService {
         return retrofit.create(CitiesService::class.java)
+    }
+
+    /**
+     * Provides the Countries service implementation.
+     * @param retrofit the Retrofit object used to instantiate the service
+     * @return the Countries service implementation.
+     */
+    @Provides
+    @Reusable
+    @JvmStatic
+    internal fun provideCountriesApi(retrofit: Retrofit): CountriesService {
+        return retrofit.create(CountriesService::class.java)
     }
 
     /**

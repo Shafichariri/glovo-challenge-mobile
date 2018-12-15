@@ -15,21 +15,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.map.MainActivity">
+        <activity
+            android:name=".ui.map.MainActivity"
+            android:screenOrientation="portrait" />
 
-        </activity>
+        <activity
+            android:name=".ui.cityPicker.CityPickerActivity"
+            android:screenOrientation="portrait" />
 
-        <activity android:name=".ui.landing.LandingActivity">
+        <activity
+            android:name=".ui.landing.LandingActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!--<activity android:name=".ui.landing.PermissionDemoActivity">-->
-
-        <!--</activity>-->
 
         <!-- Maps Key -->
         <meta-data

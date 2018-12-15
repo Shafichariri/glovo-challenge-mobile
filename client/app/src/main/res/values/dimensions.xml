@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing">16dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+    <dimen name="horizontal_padding">@dimen/spacing</dimen>
+    <dimen name="horizontal_padding_small">@dimen/spacing_small</dimen>
+    <dimen name="vertical_padding">@dimen/spacing</dimen>
+    <dimen name="vertical_padding_small">@dimen/spacing_small</dimen>
+    <dimen name="horizontal_margin">@dimen/spacing</dimen>
+    <dimen name="horizontal_margin_small">@dimen/spacing_small</dimen>
+    <dimen name="horizontal_margin_large">@dimen/spacing_large</dimen>
+    <dimen name="vertical_margin">@dimen/spacing</dimen>
+    <dimen name="vertical_margin_small">@dimen/spacing_small</dimen>
+
+
+    <dimen name="info_box_height">200dp</dimen>
+    <dimen name="bounds_padding">24dp</dimen>
+    <dimen name="list_header_height">50dp</dimen>
+    <dimen name="list_item_height">60dp</dimen>
+</resources>

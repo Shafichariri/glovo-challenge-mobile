@@ -1,6 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout>
 
-</android.support.constraint.ConstraintLayout>
+    <data>
+
+        <variable
+            name="listener"
+            type="com.shafic.challenge.ui.landing.ViewListener" />
+
+        <variable
+            name="viewModel"
+            type="com.shafic.challenge.ui.landing.LandingActivityViewModel" />
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/spacing">
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/text_view_selected_location"
+            style="@style/bodyTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vertical_margin"
+            android:layout_marginBottom="@dimen/vertical_margin"
+            android:text="@string/text_view_no_location_selected" />
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/text_view_location_permission"
+            style="@style/bodyTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/vertical_margin"
+            android:layout_gravity="center_horizontal"
+            android:text="@{viewModel.permissionMessage}" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_location_permission"
+            visibleIf="@{!viewModel.isPermissionGranted()}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/vertical_margin"
+            android:onClick="@{() -> listener.requestLocationPermission()}"
+            android:text="@string/button_enable_permission_title" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_manual_pick"
+            visibleIf="@{!viewModel.isPermissionGranted()}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/vertical_margin"
+            android:onClick="@{() -> listener.goToCountryPicker()}"
+            android:text="@string/button_open_city_picker" />
+        
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/button_open_map"
+            visibleIf="@{viewModel.isPermissionGranted()}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/vertical_margin"
+            android:onClick="@{() -> listener.goToMapActivity()}"
+            android:text="@string/button_open_map" />
+    </LinearLayout>
+</layout>

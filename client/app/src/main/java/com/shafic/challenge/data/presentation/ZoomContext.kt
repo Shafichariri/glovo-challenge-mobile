@@ -3,9 +3,7 @@ package com.shafic.challenge.data.presentation
 enum class ZoomContext {
     None, // Invalid Zoom Option
     PolygonsFriendly,
-    PolygonsClusterFriendly,
-    MarkersFriendly,
-    MarkersClusterFriendly;
+    MarkersFriendly;
 
     private val worldRadius = 156543.03392
 
@@ -16,16 +14,10 @@ enum class ZoomContext {
     companion object {
         fun create(zoom: Float): ZoomContext {
             return when (zoom) {
-                in 0.0..4.0 -> {
-                    ZoomContext.MarkersClusterFriendly
-                }
-                in 4.0..8.0 -> {
+                in 0.0..8.0 -> {
                     ZoomContext.MarkersFriendly
                 }
-                in 8.0..12.0 -> {
-                    ZoomContext.PolygonsClusterFriendly
-                }
-                in 12.0..20.0 -> {
+                in 8.0..20.0 -> {
                     ZoomContext.PolygonsFriendly
                 }
                 else -> {

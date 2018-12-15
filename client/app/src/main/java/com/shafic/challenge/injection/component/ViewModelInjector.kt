@@ -1,6 +1,8 @@
 package com.shafic.challenge.injection.component
 
+import com.shafic.challenge.common.base.BaseViewModel
 import com.shafic.challenge.injection.module.NetworkModule
+import com.shafic.challenge.ui.cityPicker.CityPickerViewModel
 import com.shafic.challenge.ui.map.MainActivityViewModel
 import dagger.Component
 import javax.inject.Singleton
@@ -14,9 +16,19 @@ import javax.inject.Singleton
 interface ViewModelInjector {
     /**
      * Injects required dependencies into the specified MainActivityViewModel.
-     * @param mainActivityViewModel MainActivityViewModel in which to inject the dependencies
+     * @param viewModel MainActivityViewModel in which to inject the dependencies
      */
-    fun inject(mainActivityViewModel: MainActivityViewModel)
+    fun inject(viewModel: MainActivityViewModel)
+
+    /**
+     * Injects required dependencies into the specified CityPickerViewModel.
+     * @param viewModel CityPickerViewModel in which to inject the dependencies
+     */
+    fun inject(viewModel: CityPickerViewModel)
+
+    //TODO: Add third vm injector
+    fun inject(viewModel: BaseViewModel)
+
 
     @Component.Builder
     interface Builder {

@@ -13,7 +13,7 @@ import java.io.IOException
 import java.util.*
 
 class RxGeoCoder private constructor() {
-    data class LocationInformation(val cityCode: String, val country: Country, val latLng: LatLng)
+    data class LocationInformation(val city: String?, val country: Country, val latLng: LatLng, val thoroughfare: String?)
     data class Result(val locationInformation: LocationInformation?, val error: RxGeoCoder.LocationInformationError?)
     
     companion object {
@@ -79,10 +79,11 @@ class RxGeoCoder private constructor() {
                     1
                 ).firstOrNull()
 
-
+            
                 val locationInformation = address?.let {
                     val country = Country(it.countryCode, it.countryName)
-                    return@let LocationInformation(it.locality, country = country, latLng = location)
+                    
+                    return@let LocationInformation(it.locality, country = country, latLng = location, thoroughfare = it.thoroughfare)
                 }
 
                 return Result(locationInformation, error = null)

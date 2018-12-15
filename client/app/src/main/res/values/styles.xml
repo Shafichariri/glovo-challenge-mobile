@@ -1,11 +1,54 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+
+    <style name="AppThemeBase" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/defaultTextColor</item>
+        <item name="colorControlActivated">@color/activeColor</item>
+        <!--Note: We might need to enable this tag, in v21 it is overridden but also set true -->
+        <!--<item name="android:fitsSystemWindows">true</item>-->
     </style>
 
+    <style name="AppTheme" parent="AppThemeBase" />
+
+    <style name="AppThemeNoActionBar" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="actionMenuTextAppearance">@style/ActionBarMenuText</item>
+    </style>
+
+    <style name="ActionBarMenuText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Menu">
+        <!--<item name="fontPath">@string/font_nexa_bold</item>-->
+        <item name="android:textSize">16sp</item>
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <!-- Start: Toolbar Styling -->
+    <style name="ToolbarStyle">
+        <!-- Note: Font is inherited from Calligraphy defaults in Context-->
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="android:theme">@style/ActionBarTheme</item>
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
+        <item name="android:background">@color/toolbarBackgroundColor</item>
+        <item name="titleTextColor">@color/toolbarTextColor</item>
+        <item name="colorControlNormal">@color/controlDefaultColor</item>
+        <item name="android:textColorPrimary">@color/toolbarTextColor</item>
+    </style>
+
+    <style name="ActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorControlNormal">@color/controlDefaultColor</item>
+        <item name="android:textColorPrimary">@color/toolbarTextColor</item>
+    </style>
+    <!-- End -->
+
+    <style name="bodyTextStyle" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/defaultTextColor</item>
+    </style>
+
+    <style name="activeTextStyle" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
 </resources>

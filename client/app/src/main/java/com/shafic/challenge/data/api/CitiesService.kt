@@ -1,7 +1,7 @@
 package com.shafic.challenge.data.api
 
 import com.shafic.challenge.data.models.City
-import io.reactivex.Single
+import io.reactivex.Maybe
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -10,9 +10,10 @@ interface CitiesService {
         const val ENDPOINT = "cities"
     }
 
+    //Replace Single by Maybe operator  or City by Optional<City>
     @GET("$ENDPOINT")
-    fun get(): Single<Array<City>>
+    fun get(): Maybe<Array<City>>
 
     @GET("$ENDPOINT/{code}")
-    fun get(@Path("code") code: String): Single<City>
+    fun get(@Path("code") code: String): Maybe<City>
 }
