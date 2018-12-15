@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".ui.map.MainActivity" />
-        
+
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/serviceableIndicatorPin"
             colorTint="@{safeUnbox(serviceable) ? R.color.enabled_pin_color : R.color.disabled_pin_color}"

@@ -1,28 +1,17 @@
 package com.shafic.challenge.injection.module
 
-import android.app.Application
-import com.shafic.challenge.ChallengeApplication
-import dagger.Binds
-import dagger.Component
-import dagger.Module
-import dagger.android.AndroidInjectionModule
-import dagger.android.AndroidInjector
-import javax.inject.Singleton
+import android.content.Context
+import com.shafic.challenge.injection.component.AppComponent
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
+//Class Accessor
+fun app(): AppComponent = AppComponent.instance
 
-@Singleton
-@Component(modules = [AppModule::class])
-internal interface AppComponent : AndroidInjector<ChallengeApplication> {
-
-    @Component.Builder
-    abstract class Builder : AndroidInjector.Builder<ChallengeApplication>()
-
-    fun build(): AppComponent
-}
-
-@Module(includes = [AndroidInjectionModule::class])
-abstract class AppModule {
-
-    @Binds
-    abstract fun application(app: ChallengeApplication): Application
+internal class AppModule(override val context: Context) : AppComponent {
+    override val mainThread: Scheduler
+        get() = AndroidSchedulers.mainThread()
+    override val backgroundThread: Scheduler
+        get() = Schedulers.io()
 }

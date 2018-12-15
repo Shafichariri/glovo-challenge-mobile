@@ -39,7 +39,7 @@ fun AppCompatActivity.simpleClassName(): String {
 
 //region VIEW EXTENSION
 fun View.parentActivity(): AppCompatActivity? {
-    return this as? AppCompatActivity
+    return this.context as? AppCompatActivity
 }
 //endregion
 

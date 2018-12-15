@@ -7,6 +7,7 @@ import com.shafic.challenge.data.api.CitiesService
 import com.shafic.challenge.data.api.CountriesService
 import com.shafic.challenge.data.models.City
 import com.shafic.challenge.data.models.Country
+import com.shafic.challenge.injection.module.api
 import com.shafic.challenge.ui.cityPicker.list.CityPickerAdapterItem
 import io.reactivex.Maybe
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -14,17 +15,16 @@ import io.reactivex.annotations.NonNull
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Inject
 
 class CityPickerViewModel : BaseViewModel() {
 
     @NonNull
     private val compositeDisposable = CompositeDisposable()
 
-    @Inject
-    lateinit var countryApi: CountriesService
-    @Inject
-    lateinit var citiesApi: CitiesService
+//    @Inject
+    var countryApi: CountriesService = api().countriesApi
+//    @Inject
+    var citiesApi: CitiesService = api().citiesApi
 
     private val itemsLiveData: MutableLiveData<MutableList<CityPickerAdapterItem>> = MutableLiveData()
     private val isLoading: MutableLiveData<Boolean> = MutableLiveData()

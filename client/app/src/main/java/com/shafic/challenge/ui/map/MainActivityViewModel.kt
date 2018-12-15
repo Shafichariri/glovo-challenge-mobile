@@ -13,6 +13,7 @@ import com.shafic.challenge.common.util.MapUtil
 import com.shafic.challenge.data.api.CitiesService
 import com.shafic.challenge.data.models.City
 import com.shafic.challenge.data.presentation.*
+import com.shafic.challenge.injection.module.api
 import com.shafic.challenge.managers.CityManager
 import com.shafic.challenge.navigation.coordinators.MainFlowProvider
 import com.shafic.challenge.ui.permission.PermissionsActivity.Companion.PERMISSIONS_REQUEST_CODE
@@ -25,14 +26,13 @@ import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.ReplaySubject
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 
 class MainActivityViewModel : BaseViewModel() {
     data class LocationChangeData(val latLng: LatLng, val provider: RxGeoCoder.LocationInformationInterface)
 
-    @Inject
-    lateinit var citiesApi: CitiesService
+//    @Inject
+    var citiesApi: CitiesService = api().citiesApi
 
     private lateinit var subscription: Disposable
     private lateinit var readinessSubscription: Disposable

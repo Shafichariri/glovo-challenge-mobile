@@ -31,7 +31,6 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
         }
 
         fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean? {
-            val data = data ?: return null
             if (!shouldHandleActivityResult(requestCode, resultCode, data)) {
                 return null
             }
