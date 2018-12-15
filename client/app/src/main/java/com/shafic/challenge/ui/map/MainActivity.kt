@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.util.Log
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -53,8 +52,12 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         // isGranted, if Null activity result was not ours
-        val isGranted = PermissionsActivity.handleActivityResult(requestCode, resultCode, data)
-        //TODO: What happens now [Update UI]
+        val isGranted = PermissionsActivity.handleActivityResult(requestCode, resultCode, data) ?: return
+        if (isGranted) {
+            setupUserLocationListener()
+        } else {
+            //TODO: What happens now [Update UI: Show Request Button]   
+        }
     }
 
     override fun onCreateViewDataBinding(savedInstanceState: Bundle?): ActivityMainBinding? {
@@ -69,26 +72,6 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
         viewModel.setFlowCoordinator(MainFlowCoordinator())
         viewBinding()?.viewModel = viewModel
         addLiveDataObservers()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.e("SHAFICTEST", "ONRESUME")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.e("SHAFICTEST", "ONPAUSE")
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Log.e("SHAFICTEST", "ONSTART")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.e("SHAFICTEST", "ONSTOP")
     }
 
     override fun onMapLoaded(googleMap: GoogleMap) {
@@ -129,7 +112,7 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     }
 
     override fun onUserLocationPermissionFailure(fineLocationPermissionError: Int, coarseLocationPermissionError: Int) {
-        //Note: This activity does not handle location permissions by itself, delegate Action to Activity launcher
+        //Note: This activity does not handle location permissions by itself, it delegates Action to another Activity
         showNeedsPermissionAlert()
     }
 

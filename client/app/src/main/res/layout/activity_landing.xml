@@ -39,7 +39,7 @@
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/button_location_permission"
-            visibleIf="@{!viewModel.isPermissionGranted()}"
+            visibleIf="@{!safeUnbox(viewModel.isPermissionGranted())}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/vertical_margin"
@@ -48,20 +48,20 @@
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/button_manual_pick"
-            visibleIf="@{!viewModel.isPermissionGranted()}"
+            visibleIf="@{!safeUnbox(viewModel.isPermissionGranted())}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/vertical_margin"
-            android:onClick="@{() -> listener.goToCountryPicker()}"
+            android:onClick="@{() -> viewModel.goToCityPicker()}"
             android:text="@string/button_open_city_picker" />
         
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/button_open_map"
-            visibleIf="@{viewModel.isPermissionGranted()}"
+            visibleIf="@{safeUnbox(viewModel.isPermissionGranted())}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/vertical_margin"
-            android:onClick="@{() -> listener.goToMapActivity()}"
+            android:onClick="@{() -> viewModel.goToMapActivity()}"
             android:text="@string/button_open_map" />
     </LinearLayout>
 </layout>

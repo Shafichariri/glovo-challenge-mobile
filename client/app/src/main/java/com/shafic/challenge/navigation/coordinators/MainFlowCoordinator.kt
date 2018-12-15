@@ -21,11 +21,20 @@ class MainFlowCoordinator : MainFlowProvider {
         navigator.showCityPicker(requestCode)
     }
 
+    override fun closePermissionHandler(resultCode: Int) {
+        navigator.finishPermissionHandler(resultCode)
+    }
+
+    override fun goToAppSettings() {
+        navigator.goToAppSettings()
+    }
 }
 
 interface MainFlowProvider {
     fun start()
     fun showPermissionHandler(requestCode: Int)
     fun requestCityPicker(requestCode: Int)
+    fun closePermissionHandler(resultCode: Int)
+    fun goToAppSettings()
 }
 

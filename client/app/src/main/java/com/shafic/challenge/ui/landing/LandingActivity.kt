@@ -6,15 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import com.shafic.challenge.R
 import com.shafic.challenge.common.Dialogs
 import com.shafic.challenge.common.base.AbstractBaseActivity
-import com.shafic.challenge.common.settingsStarterIntent
 import com.shafic.challenge.common.toast
 import com.shafic.challenge.databinding.ActivityLandingBinding
 import com.shafic.challenge.injection.ViewModelFactory
-import com.shafic.challenge.navigation.Navigator
 import com.shafic.challenge.navigation.coordinators.MainFlowCoordinator
 import com.shafic.challenge.ui.cityPicker.CityPickerActivity
 import com.vanniktech.rxpermission.Permission
@@ -53,7 +50,8 @@ class LandingActivity : AbstractBaseActivity<ActivityLandingBinding>(), ViewList
 
         viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(LandingActivityViewModel::class.java)
         viewModel.setFlowCoordinator(MainFlowCoordinator())
-
+        binding?.viewModel = viewModel
+        
         handleRouting()
     }
 
@@ -76,7 +74,7 @@ class LandingActivity : AbstractBaseActivity<ActivityLandingBinding>(), ViewList
         if (!isLocationPermissionGranted()) {
             requestLocationPermission()
         } else {
-            goToMapActivity()
+            viewModel.goToMapActivity()
         }
     }
 
@@ -98,7 +96,7 @@ class LandingActivity : AbstractBaseActivity<ActivityLandingBinding>(), ViewList
     private fun handlePermissionResult(granted: Permission) {
         when (granted.state()) {
             Permission.State.GRANTED -> {
-                goToMapActivity()
+                viewModel.goToMapActivity()
             }
             Permission.State.DENIED -> {
                 //TODO: On denied
@@ -120,33 +118,27 @@ class LandingActivity : AbstractBaseActivity<ActivityLandingBinding>(), ViewList
             title = getString(R.string.dialog_location_permission_show_settings_title),
             negativeButton = getString(R.string.dialog_negative_button_title),
             positiveButton = getString(R.string.dialog_positive_button_title),
-            positiveAction = { goToAppSettings() })
+            positiveAction = { viewModel.goToAppSettings() })
 
         alertDialog?.show()
-    }
-
-    private fun goToAppSettings() {
-        val appSettingsIntent = settingsStarterIntent()
-        appSettingsIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        ContextCompat.startActivity(this, appSettingsIntent, null)
     }
 
     private fun handleCitySelection(requestCode: Int, resultCode: Int, data: Intent?) {
         val result = CityPickerActivity.handleActivityResult(requestCode, resultCode, data) ?: return
         toast(this, "[cityCode: ${result.cityCode}  ||| countryCode: ${result.countryCode}]")
     }
-
-    override fun goToMapActivity() {
-        Navigator.showMap()
-    }
-
-    override fun goToCountryPicker() {
-        Navigator.showCityPicker(CityPickerActivity.SELECTION_REQUEST_CODE)
-    }
+//
+//    override fun goToMapActivity() {
+//        viewModel.goToMapActivity()
+//    }
+//
+//    override fun goToCityPicker() {
+//        viewModel.goToCountryPicker()
+//    }
 }
 
 interface ViewListener {
     fun requestLocationPermission()
-    fun goToCountryPicker()
-    fun goToMapActivity()
+//    fun goToCityPicker()
+//    fun goToMapActivity()
 }

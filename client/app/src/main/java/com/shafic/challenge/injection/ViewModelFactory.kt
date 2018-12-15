@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProvider
 import com.shafic.challenge.ui.cityPicker.CityPickerViewModel
 import com.shafic.challenge.ui.landing.LandingActivityViewModel
 import com.shafic.challenge.ui.map.MainActivityViewModel
+import com.shafic.challenge.ui.permission.PermissionsViewModel
 
 class ViewModelFactory : ViewModelProvider.Factory {
     //We add to the construct any property needed for the VM initialization [If Any, ex: Context for Getting DB Instance]
@@ -18,6 +19,9 @@ class ViewModelFactory : ViewModelProvider.Factory {
         } else if (modelClass.isAssignableFrom(CityPickerViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return CityPickerViewModel() as T
+        } else if (modelClass.isAssignableFrom(PermissionsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return PermissionsViewModel() as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
 

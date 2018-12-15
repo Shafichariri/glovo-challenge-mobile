@@ -1,17 +1,17 @@
 package com.shafic.challenge.ui.permission
 
 import android.Manifest
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import com.shafic.challenge.R
 import com.shafic.challenge.common.Dialogs
 import com.shafic.challenge.common.base.AbstractBaseActivity
-import com.shafic.challenge.common.base.BaseViewModel
-import com.shafic.challenge.common.settingsStarterIntent
 import com.shafic.challenge.databinding.ActivityPermissionsBinding
+import com.shafic.challenge.injection.ViewModelFactory
+import com.shafic.challenge.navigation.coordinators.MainFlowCoordinator
 import com.vanniktech.rxpermission.Permission
 import com.vanniktech.rxpermission.RealRxPermission
 import io.reactivex.annotations.NonNull
@@ -38,12 +38,13 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
             //Return TRUE if permission is granted
             return resultCode == GRANTED_RESULT_CODE
         }
-
+        //TODO: Pass In Permission name arguments
         fun intent(context: Context): Intent = Intent(context, PermissionsActivity::class.java)
     }
 
     @NonNull
     private val compositeDisposable = CompositeDisposable()
+    private lateinit var viewModel: PermissionsViewModel
 
     override val layoutId: Int
         get() = R.layout.activity_permissions
@@ -53,6 +54,8 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
     }
 
     override fun onCreated(savedInstanceState: Bundle?) {
+        viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(PermissionsViewModel::class.java)
+        viewModel.setFlowCoordinator(MainFlowCoordinator())
         startRequest()
     }
 
@@ -78,8 +81,7 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
                 handlePermissionResult(it)
             }, {
                 it?.printStackTrace()
-                setResult(FAILED_RESULT_CODE)
-                finish()
+                viewModel.finishPermissionWithResult(FAILED_RESULT_CODE)
             })
         compositeDisposable.add(disposable)
     }
@@ -89,16 +91,13 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
     }
 
     private fun handlePermissionResult(granted: Permission) {
+        //TODO: Use extras to handle multiple permissions requests
         when (granted.state()) {
             Permission.State.GRANTED -> {
-                //TODO: Use extras to handle multiple permissions requests
-                setResult(GRANTED_RESULT_CODE)
-                finish()
+                viewModel.finishPermissionWithResult(GRANTED_RESULT_CODE)
             }
             Permission.State.DENIED -> {
-                //TODO: On denied
-                setResult(DENIED_RESULT_CODE)
-                finish()
+                viewModel.finishPermissionWithResult(DENIED_RESULT_CODE)
             }
             Permission.State.DENIED_NOT_SHOWN, Permission.State.REVOKED_BY_POLICY -> {
                 showAppSettingsLauncherDialog()
@@ -108,27 +107,17 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
     }
 
     private fun showAppSettingsLauncherDialog() {
+        //TODO: Delegate message and title (also Parameters to intent) 
         val alertDialog = Dialogs.createDefault(context = this,
             message = getString(R.string.dialog_location_permission_show_settings_message),
             title = getString(R.string.dialog_location_permission_show_settings_title),
             negativeButton = getString(R.string.dialog_negative_button_title),
             positiveButton = getString(R.string.dialog_positive_button_title),
-            positiveAction = { goToAppSettings() },
+            positiveAction = { viewModel.goToSettings() },
             negativeAction = {
-                setResult(DENIED_RESULT_CODE)
-                finish()
+                viewModel.finishPermissionWithResult(DENIED_RESULT_CODE)
             })
 
         alertDialog?.show()
     }
-
-    private fun goToAppSettings() {
-        val appSettingsIntent = settingsStarterIntent()
-        appSettingsIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        ContextCompat.startActivity(this, appSettingsIntent, null)
-    }
-}
-
-class PermissionsViewModel : BaseViewModel() {
-
 }

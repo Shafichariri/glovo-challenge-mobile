@@ -172,7 +172,7 @@ abstract class AbstractMapActivity<B : ViewDataBinding> : AbstractBaseActivity<B
     //endregion
 
     //region USER LOCATION REQUEST [DOES NOT HANDLE PERMISSION REQUEST]
-    private fun setupUserLocationListener() {
+    internal fun setupUserLocationListener() {
         val client = LocationServices.getFusedLocationProviderClient(this)
         val fineLocationPermissionCheck: Int =
             ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)

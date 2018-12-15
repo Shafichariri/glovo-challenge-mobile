@@ -1,7 +1,10 @@
 package com.shafic.challenge.navigation
 
+import android.content.Intent
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import com.shafic.challenge.common.settingsStarterIntent
 import com.shafic.challenge.common.simpleClassName
 import com.shafic.challenge.ui.cityPicker.CityPickerActivity
 import com.shafic.challenge.ui.map.MainActivity
@@ -39,29 +42,48 @@ object Navigator : NavigationProvider {
 
     override fun showMap() {
         val activity = weakActivity?.get() ?: return handleNoActivityReference()
-        
+
         Log.e(TAG, "SHOW MAP ===> Using [$name]")
-        
+
         val intent = MainActivity.intent(activity)
         activity.startActivity(intent)
     }
 
     override fun showCityPicker(requestCode: Int) {
         val activity = weakActivity?.get() ?: return handleNoActivityReference()
-        
+
         Log.e(TAG, "SHOW CITY PICKER ===> Using [$name]")
-        
+
         val intent = CityPickerActivity.intent(activity)
         activity.startActivityForResult(intent, requestCode)
     }
 
     override fun showPermissionHandler(requestCode: Int) {
         val activity = weakActivity?.get() ?: return handleNoActivityReference()
-        
+
         Log.e(TAG, "SHOW PERMISSION HANDLER ===> Using [$name]")
-        
+
         val intent = PermissionsActivity.intent(activity)
         activity.startActivityForResult(intent, requestCode)
+    }
+
+    override fun finishPermissionHandler(resultCode: Int) {
+        val activity = weakActivity?.get() ?: return handleNoActivityReference()
+
+        Log.e(TAG, "FINISH PERMISSION HANDLER ===> Using [$name]")
+
+        activity.setResult(resultCode)
+        activity.finish()
+    }
+
+    override fun goToAppSettings() {
+        val activity = weakActivity?.get() ?: return handleNoActivityReference()
+
+        Log.e(TAG, "GOTO SETTINGS ===> Using [$name]")
+        
+        val appSettingsIntent = activity.settingsStarterIntent()
+        appSettingsIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        ContextCompat.startActivity(activity, appSettingsIntent, null)
     }
 
     private fun handleNoActivityReference() {
@@ -75,12 +97,10 @@ object Navigator : NavigationProvider {
     }
 }
 
-//interface ActivityProvider {
-//    var weakActivity: WeakReference<AppCompatActivity>?
-//}
-
 interface NavigationProvider {
     fun showMap()
     fun showCityPicker(requestCode: Int)
     fun showPermissionHandler(requestCode: Int)
+    fun finishPermissionHandler(resultCode: Int)
+    fun goToAppSettings()
 }
