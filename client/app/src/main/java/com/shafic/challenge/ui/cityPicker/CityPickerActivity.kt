@@ -94,7 +94,7 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
     }
 
     private fun showAlertSelectionValidation(city: City) {
-        val alertDialog = Dialogs.create(context = this,
+        val alertDialog = Dialogs.createDefault(context = this,
             message = getString(R.string.dialog_city_selection_message, city.name),
             title = getString(R.string.dialog_city_selection_title),
             negativeAction = { viewModel.cancelSelection() },

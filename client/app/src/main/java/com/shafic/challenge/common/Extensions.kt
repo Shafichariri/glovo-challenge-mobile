@@ -30,6 +30,11 @@ fun AppCompatActivity.settingsStarterIntent(): Intent {
     return Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
         .addCategory(Intent.CATEGORY_DEFAULT)
 }
+
+fun AppCompatActivity.simpleClassName(): String {
+    return this.javaClass.simpleName
+}
+     
 //endregion
 
 //region VIEW EXTENSION

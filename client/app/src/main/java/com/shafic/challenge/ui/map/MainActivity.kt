@@ -5,12 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
+import android.util.Log
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.shafic.challenge.R
+import com.shafic.challenge.common.Dialogs
 import com.shafic.challenge.common.RxGeoCoder
 import com.shafic.challenge.common.base.AbstractMapActivity
 import com.shafic.challenge.common.polygon
@@ -20,12 +21,13 @@ import com.shafic.challenge.common.util.MapUtil
 import com.shafic.challenge.data.presentation.MapDataPresentation
 import com.shafic.challenge.databinding.ActivityMainBinding
 import com.shafic.challenge.injection.ViewModelFactory
+import com.shafic.challenge.navigation.coordinators.MainFlowCoordinator
+import com.shafic.challenge.ui.permission.PermissionsActivity
 
 
 class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallback,
     AdvancedGoogleMapFragment.MapScrollListener {
     companion object {
-        const val NEED_LOCATION_PERMISSIONS = 99807
         private val TAG = MainActivity::class.java.simpleName
         fun intent(context: Context): Intent = Intent(context, MainActivity::class.java)
     }
@@ -42,11 +44,18 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     private lateinit var viewModel: MainActivityViewModel
 
     override val mapFragmentId: Int
-        get() = R.id.map
+        get() = R.id.map_fragment
     override val layoutId: Int
         get() = R.layout.activity_main
     override val requestsUserLocation: Boolean
         get() = true
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        // isGranted, if Null activity result was not ours
+        val isGranted = PermissionsActivity.handleActivityResult(requestCode, resultCode, data)
+        //TODO: What happens now [Update UI]
+    }
 
     override fun onCreateViewDataBinding(savedInstanceState: Bundle?): ActivityMainBinding? {
         return DataBindingUtil.setContentView(this, layoutId)
@@ -55,10 +64,31 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     override fun onCreated(savedInstanceState: Bundle?) {
         actionBar?.title = resources.getString(R.string.action_bar_title_landing)
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        
+
         viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(MainActivityViewModel::class.java)
+        viewModel.setFlowCoordinator(MainFlowCoordinator())
         viewBinding()?.viewModel = viewModel
         addLiveDataObservers()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.e("SHAFICTEST", "ONRESUME")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.e("SHAFICTEST", "ONPAUSE")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.e("SHAFICTEST", "ONSTART")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.e("SHAFICTEST", "ONSTOP")
     }
 
     override fun onMapLoaded(googleMap: GoogleMap) {
@@ -129,7 +159,7 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
             binding.textviewCityTimezone.text =
                     resources.getString(R.string.text_view_city_timezone, locationInfo?.city?.timeZone ?: "")
         })
-        
+
         viewModel.isServiceable.observe(this, android.arch.lifecycle.Observer { serviceable ->
             this.viewBinding()?.serviceable = serviceable
         })
@@ -169,17 +199,15 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     }
 
     private fun showNeedsPermissionAlert() {
-        val alertDialog = AlertDialog.Builder(this).create()
-        val positiveButtonTitle = getString(R.string.ok)
-        alertDialog.setTitle(getString(R.string.dialog_location_permission_lost_show_title))
-        alertDialog.setMessage(getString(R.string.dialog_location_permission_lost_show_message))
-        alertDialog.setButton(
-            AlertDialog.BUTTON_NEUTRAL, positiveButtonTitle
-        ) { _, _ ->
-            setResult(NEED_LOCATION_PERMISSIONS)
-            finish()
-        }
+        val title = getString(R.string.dialog_location_permission_lost_show_title)
+        val message = getString(R.string.dialog_location_permission_lost_show_message)
+        val alertDialog = Dialogs.createNeutral(this, title = title, message = message,
+            neutralAction = {
+                viewModel.handlePermissions()
+            })
 
-        alertDialog.show()
+//                setResult(NEED_LOCATION_PERMISSIONS)
+//                finish()
+        alertDialog?.show()
     }
 }

@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.databinding.ViewDataBinding
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.LocationServices
@@ -22,7 +21,7 @@ import com.shafic.challenge.common.ui.AdvancedGoogleMapFragment
 import com.shafic.challenge.common.util.MapUtil
 import com.shafic.challenge.data.presentation.SimpleCity
 
-abstract class AbstractMapActivity<B : ViewDataBinding> : AppCompatActivity(), OnMapReadyCallback,
+abstract class AbstractMapActivity<B : ViewDataBinding> : AbstractBaseActivity<B>(), OnMapReadyCallback,
     AdvancedGoogleMapFragment.MapScrollListener {
     companion object {
         internal const val GAPI_ERROR_DIALOG_RESULT = 12345
@@ -30,13 +29,10 @@ abstract class AbstractMapActivity<B : ViewDataBinding> : AppCompatActivity(), O
 
     //region ABSTRACT PROPERTIES
     abstract val mapFragmentId: Int
-    abstract val layoutId: Int
     abstract val requestsUserLocation: Boolean
     //endregion
 
     //region ABSTRACT METHODS
-    abstract fun onCreated(savedInstanceState: Bundle?)
-
     abstract fun onMapLoaded(googleMap: GoogleMap)
 
     abstract fun onGoogleServicesNotAvailable()
@@ -44,8 +40,6 @@ abstract class AbstractMapActivity<B : ViewDataBinding> : AppCompatActivity(), O
     abstract fun onUserLocationReady(latLng: LatLng?, error: Throwable?)
 
     abstract fun onUserLocationPermissionFailure(fineLocationPermissionError: Int, coarseLocationPermissionError: Int)
-
-    abstract fun onCreateViewDataBinding(savedInstanceState: Bundle?): B?
     //endregion
 
     //region M A P  S C R O L L  L I S T E N E R
@@ -73,9 +67,9 @@ abstract class AbstractMapActivity<B : ViewDataBinding> : AppCompatActivity(), O
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewDataBinding = onCreateViewDataBinding(savedInstanceState)
         mapFragment?.getMapAsync(this)
-        onCreated(savedInstanceState)
+
+        //Note: onCreated is already called in super's BaseActivity
 
         if (requestsUserLocation) {
             setupUserLocationListener()
@@ -86,10 +80,6 @@ abstract class AbstractMapActivity<B : ViewDataBinding> : AppCompatActivity(), O
         super.onResume()
         handleGoogleServicesAvailability()
         onResumed()
-    }
-
-    protected fun viewBinding(): B? {
-        return viewDataBinding
     }
 
     internal fun onResumed() {

@@ -14,8 +14,9 @@ import com.shafic.challenge.common.settingsStarterIntent
 import com.shafic.challenge.common.toast
 import com.shafic.challenge.databinding.ActivityLandingBinding
 import com.shafic.challenge.injection.ViewModelFactory
+import com.shafic.challenge.navigation.Navigator
+import com.shafic.challenge.navigation.coordinators.MainFlowCoordinator
 import com.shafic.challenge.ui.cityPicker.CityPickerActivity
-import com.shafic.challenge.ui.map.MainActivity
 import com.vanniktech.rxpermission.Permission
 import com.vanniktech.rxpermission.RealRxPermission
 import io.reactivex.annotations.NonNull
@@ -49,7 +50,10 @@ class LandingActivity : AbstractBaseActivity<ActivityLandingBinding>(), ViewList
         actionBar?.title = resources.getString(R.string.action_bar_title_landing)
         val binding = viewBinding()
         binding?.listener = this
+
         viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(LandingActivityViewModel::class.java)
+        viewModel.setFlowCoordinator(MainFlowCoordinator())
+
         handleRouting()
     }
 
@@ -111,7 +115,7 @@ class LandingActivity : AbstractBaseActivity<ActivityLandingBinding>(), ViewList
     }
 
     private fun showAppSettingsLauncherDialog() {
-        val alertDialog = Dialogs.create(context = this,
+        val alertDialog = Dialogs.createDefault(context = this,
             message = getString(R.string.dialog_location_permission_show_settings_message),
             title = getString(R.string.dialog_location_permission_show_settings_title),
             negativeButton = getString(R.string.dialog_negative_button_title),
@@ -133,13 +137,11 @@ class LandingActivity : AbstractBaseActivity<ActivityLandingBinding>(), ViewList
     }
 
     override fun goToMapActivity() {
-        val intent = MainActivity.intent(this)
-        startActivity(intent)
+        Navigator.showMap()
     }
 
     override fun goToCountryPicker() {
-        val intent = CityPickerActivity.intent(this)
-        startActivityForResult(intent, CityPickerActivity.SELECTION_REQUEST_CODE)
+        Navigator.showCityPicker(CityPickerActivity.SELECTION_REQUEST_CODE)
     }
 }
 

@@ -19,6 +19,15 @@
         <item name="actionMenuTextAppearance">@style/ActionBarMenuText</item>
     </style>
 
+    <style name="AppThemeTransparent" parent="AppTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+    
     <style name="ActionBarMenuText" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Menu">
         <!--<item name="fontPath">@string/font_nexa_bold</item>-->
         <item name="android:textSize">16sp</item>

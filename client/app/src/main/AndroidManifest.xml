@@ -22,7 +22,9 @@
         <activity
             android:name=".ui.cityPicker.CityPickerActivity"
             android:screenOrientation="portrait" />
-
+        
+        <activity android:name=".ui.permission.PermissionsActivity"
+            android:theme="@style/AppThemeTransparent"/>
         <activity
             android:name=".ui.landing.LandingActivity"
             android:screenOrientation="portrait">

@@ -14,6 +14,8 @@ import com.shafic.challenge.data.api.CitiesService
 import com.shafic.challenge.data.models.City
 import com.shafic.challenge.data.presentation.*
 import com.shafic.challenge.managers.CityManager
+import com.shafic.challenge.navigation.coordinators.MainFlowProvider
+import com.shafic.challenge.ui.permission.PermissionsActivity.Companion.PERMISSIONS_REQUEST_CODE
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -50,12 +52,21 @@ class MainActivityViewModel : BaseViewModel() {
 
     private var decodedCities: List<SimpleCity> = arrayListOf()
     private var cities: MutableList<City> = arrayListOf()
+    private var flow: MainFlowProvider? = null
 
     init {
         setupReadinessObservable()
         setupVisibleRegionChangedObservable()
         loadCities()
         setupLocationChangedObservable()
+    }
+
+    fun handlePermissions() {
+        flow?.showPermissionHandler(PERMISSIONS_REQUEST_CODE)
+    }
+
+    fun setFlowCoordinator(flow: MainFlowProvider) {
+        this.flow = flow
     }
 
     override fun onCleared() {
