@@ -13,12 +13,18 @@ class Dialogs {
             message: String?,
             neutralButton: String? = context?.getString(R.string.ok)
         ): AlertDialog? {
+            val emptyNeutralAction: (() -> Unit)? = if (neutralAction == null) {
+                {
+                    //EMPTY BLOCK
+                }
+            } else null
+            
             return create(
                 context,
                 neutralButton = neutralButton,
                 title = title,
                 message = message,
-                neutralAction = neutralAction
+                neutralAction = neutralAction ?: emptyNeutralAction
             )
         }
 
@@ -31,10 +37,22 @@ class Dialogs {
             positiveButton: String? = context?.getString(R.string.ok),
             negativeButton: String? = context?.getString(R.string.cancel)
         ): AlertDialog? {
+            
+            val emptyNegativeAction: (() -> Unit)? = if (negativeAction == null) {
+                {
+                    //EMPTY BLOCK
+                }
+            } else null
+            val emptyPositiveAction: (() -> Unit)? = if (positiveAction == null) {
+                {
+                    //EMPTY BLOCK
+                }
+            } else null
+
             return create(
                 context,
-                positiveAction = positiveAction,
-                negativeAction = negativeAction,
+                positiveAction = positiveAction ?: emptyPositiveAction,
+                negativeAction = negativeAction ?: emptyNegativeAction,
                 positiveButton = positiveButton,
                 negativeButton = negativeButton,
                 title = title,

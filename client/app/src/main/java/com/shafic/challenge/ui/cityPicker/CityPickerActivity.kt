@@ -23,14 +23,14 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
     data class SelectedItem(val cityCode: String, val countryCode: String)
 
     companion object {
-        const val SELECTION_REQUEST_CODE = 34535
-        const val SELECTION_RESULT_CODE = 63732
+        const val SELECTION_REQUEST_CODE = 20000
+        const val SELECTION_RESULT_CODE = 20001
         const val EXTRA_KEY_CITY_CODE = "CITY_CODE"
         const val EXTRA_KEY_COUNTRY_CODE = "CITY_COUNTRY_CODE"
 
         private val TAG = LandingActivity::class.java.simpleName
 
-        private fun shouldHandleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+        fun shouldHandleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
             return SELECTION_REQUEST_CODE == requestCode && SELECTION_RESULT_CODE == resultCode &&
                     data != null
         }

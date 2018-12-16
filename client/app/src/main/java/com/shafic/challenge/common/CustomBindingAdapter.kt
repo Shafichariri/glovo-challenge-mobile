@@ -2,8 +2,10 @@ package com.shafic.challenge.common
 
 import android.databinding.BindingAdapter
 import android.support.annotation.ColorRes
+import android.support.annotation.DimenRes
 import android.support.v4.content.ContextCompat
 import android.support.v4.graphics.drawable.DrawableCompat
+import android.support.v4.view.ViewCompat
 import android.support.v7.widget.AppCompatImageView
 import android.view.View
 
@@ -21,5 +23,13 @@ class CustomBindingAdapter {
         fun setColorTint(view: AppCompatImageView, @ColorRes color: Int) {
             DrawableCompat.setTint(view.drawable, ContextCompat.getColor(view.context, color))
         }
+
+
+        @JvmStatic
+        @BindingAdapter("elevation")
+        fun setViewElevation(view: AppCompatImageView, @DimenRes dimenRes: Int) {
+            ViewCompat.setElevation(view, view.resources.getDimension(dimenRes))
+        }
+        
     }
 }

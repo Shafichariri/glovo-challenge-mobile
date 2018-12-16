@@ -19,10 +19,10 @@ import io.reactivex.disposables.CompositeDisposable
 
 class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
     companion object {
-        const val PERMISSIONS_REQUEST_CODE = 34535
-        const val GRANTED_RESULT_CODE = 113453
-        const val DENIED_RESULT_CODE = 113452
-        const val FAILED_RESULT_CODE = 113451
+        const val PERMISSIONS_REQUEST_CODE = 10000
+        const val GRANTED_RESULT_CODE = 10001
+        const val DENIED_RESULT_CODE = 10002
+        const val FAILED_RESULT_CODE = 10003
 
         private val TAG = PermissionsActivity::class.java.simpleName
 
@@ -67,8 +67,7 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
         if (!isLocationPermissionGranted()) {
             requestLocationPermission()
         } else {
-            setResult(GRANTED_RESULT_CODE)
-            finish()
+            viewModel.finishPermissionWithResult(GRANTED_RESULT_CODE)
         }
     }
 

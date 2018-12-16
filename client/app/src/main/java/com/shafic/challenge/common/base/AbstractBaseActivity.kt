@@ -3,6 +3,8 @@ package com.shafic.challenge.common.base
 import android.databinding.ViewDataBinding
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import com.shafic.challenge.common.simpleClassName
 import com.shafic.challenge.navigation.Navigator
 import java.lang.ref.WeakReference
 
@@ -34,17 +36,43 @@ abstract class AbstractBaseActivity<B : ViewDataBinding> : AppCompatActivity() {
 
     @Suppress("UNCHECKED_CAST")
     override fun onStart() {
-        Navigator.add(weakThis!! as WeakReference<AppCompatActivity>)
+        Log.e("TESTING","onStart: ${weakThis!!.get()?.simpleClassName()}")
+        updateNavigatorState(Action.add)
         super.onStart()
     }
 
     @Suppress("UNCHECKED_CAST")
     override fun onStop() {
-        Navigator.remove(weakThis!! as WeakReference<AppCompatActivity>)
+        Log.e("TESTING","onStop: ${weakThis!!.get()?.simpleClassName()}")
+        updateNavigatorState(Action.remove)
         super.onStop()
     }
 
+    override fun onPause() {
+        Log.e("TESTING","onPause: ${weakThis!!.get()?.simpleClassName()}")
+        super.onPause()
+    }
+
+    override fun onResume() {
+        updateNavigatorState(Action.add)
+        Log.e("TESTING","onResume: ${weakThis!!.get()?.simpleClassName()}")
+        super.onResume()
+    }
+    
+    private fun updateNavigatorState(action: Action) {
+        when (action) {
+            Action.add -> Navigator.add(weakThis!! as WeakReference<AppCompatActivity>)
+            Action.remove -> Navigator.remove(weakThis!! as WeakReference<AppCompatActivity>)
+        }
+    }
+    
     protected fun viewBinding(): B? {
         return viewDataBinding
+    }
+    
+    
+    private enum class Action {
+        add,
+        remove
     }
 }

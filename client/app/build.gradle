@@ -74,14 +74,14 @@ dependencies {
     
     //Dagger 
     // Dagger core
-    kapt "com.google.dagger:dagger-compiler:$project.daggerVersion"
-    implementation "com.google.dagger:dagger:$project.daggerVersion"
+//    kapt "com.google.dagger:dagger-compiler:$project.daggerVersion"
+//    implementation "com.google.dagger:dagger:$project.daggerVersion"
 
     // Dagger Android
-    kapt "com.google.dagger:dagger-android-processor:$project.daggerVersion"
-    implementation "com.google.dagger:dagger-android-support:$project.daggerVersion"
-    // if you are not using support library, include this instead
-    implementation "com.google.dagger:dagger-android:$project.daggerVersion"
+//    kapt "com.google.dagger:dagger-android-processor:$project.daggerVersion"
+//    implementation "com.google.dagger:dagger-android-support:$project.daggerVersion"
+//    // if you are not using support library, include this instead
+//    implementation "com.google.dagger:dagger-android:$project.daggerVersion"
     
     //Arch. components: Lifecycle
     implementation "android.arch.lifecycle:runtime:$project.lifecycleVersion"

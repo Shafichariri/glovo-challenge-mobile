@@ -3,10 +3,10 @@ package com.shafic.challenge.ui.landing
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import com.shafic.challenge.common.base.BaseViewModel
-import com.shafic.challenge.navigation.Navigator
 import com.shafic.challenge.navigation.coordinators.MainFlowProvider
 import com.shafic.challenge.ui.cityPicker.CityPickerActivity
 
+@Deprecated("This is not used anymore, Use MainActivity Instead")
 class LandingActivityViewModel : BaseViewModel() {
     private var flow: MainFlowProvider? = null
     private val permissionMessageLiveData: MutableLiveData<String> = MutableLiveData()
@@ -33,14 +33,14 @@ class LandingActivityViewModel : BaseViewModel() {
     }
 
     fun goToAppSettings() {
-        Navigator.goToAppSettings()
+        flow?.goToAppSettings()
     }
 
     fun goToMapActivity() {
-        Navigator.showMap()
+        flow?.start()
     }
 
     fun goToCityPicker() {
-        Navigator.showCityPicker(CityPickerActivity.SELECTION_REQUEST_CODE)
+        flow?.requestCityPicker(CityPickerActivity.SELECTION_REQUEST_CODE)
     }
 }

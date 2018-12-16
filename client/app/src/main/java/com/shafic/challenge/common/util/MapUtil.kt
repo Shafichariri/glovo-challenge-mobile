@@ -4,7 +4,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Polygon
 import com.google.maps.android.PolyUtil
-import com.google.maps.android.SphericalUtil
 
 class MapUtil {
     companion object {
@@ -12,7 +11,7 @@ class MapUtil {
         private const val COLOR_SEMI_TRANSPARENT = 0x7F73c9d3
         private const val POLYGON_STROKE_WIDTH_PX = 1.0f
         private const val POLYGON_DECODING_TAG_DELIMITER = "|:|"
-        
+
         fun stylePolygon(polygon: Polygon, showBounds: Boolean) {
             var strokeColor = COLOR_SEMI_PURPLE_ARGB
             var fillColor = COLOR_SEMI_TRANSPARENT
@@ -22,28 +21,10 @@ class MapUtil {
             polygon.fillColor = fillColor
         }
 
-        fun joinPolygons(polygon: List<List<LatLng>>): List<LatLng> {
-            val allPoints = polygon.flatMap { it }
-            return PolyUtil.simplify(allPoints, 500.0)
-        }
-
-        fun isPointCloseToPolygon(point: LatLng, polygon: List<LatLng>, tolerance: Double = 1000.0): Boolean {
-            if (polygon.isEmpty()) return false
-            val simplified = PolyUtil.simplify(polygon, tolerance)
-            simplified.forEach {
-                if (PolyUtil.isLocationOnEdge(it, polygon, true, tolerance)) {
-                    return true
-                }
-            }
-            return false
-        }
-
         fun isPointWithinBounds(
-            bounds: List<LatLng>, point: LatLng, geodesic: Boolean = true,
-            tolerance: Double = 1000.0
+            bounds: List<LatLng>, point: LatLng, geodesic: Boolean = true
         ): Boolean {
             return PolyUtil.containsLocation(point, bounds, geodesic)
-            // || PolyUtil.isLocationOnEdge(point, bounds, geodesic, tolerance)
         }
 
         fun isPolygonWithinBounds(bounds: List<LatLng>, polygon: List<LatLng>, geodesic: Boolean = true): Boolean {
@@ -55,14 +36,6 @@ class MapUtil {
                 }
             }
             return false
-        }
-
-        fun computeDistanceBetween(from: LatLng, to: LatLng): Double {
-            return SphericalUtil.computeDistanceBetween(from, to)
-        }
-
-        fun isOfLatLngs(latLngs: List<LatLng>): LatLng {
-            return createLatLngsBounds(latLngs = latLngs).center
         }
 
         fun centerOfLatLngs(latLngs: List<LatLng>): LatLng {

@@ -12,7 +12,7 @@ interface CitiesService {
 
     //Replace Single by Maybe operator  or City by Optional<City>
     @GET("$ENDPOINT")
-    fun get(): Maybe<Array<City>>
+    fun get(): Maybe<List<City>>
 
     @GET("$ENDPOINT/{code}")
     fun get(@Path("code") code: String): Maybe<City>

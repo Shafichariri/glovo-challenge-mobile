@@ -19,7 +19,7 @@ import com.vanniktech.rxpermission.RealRxPermission
 import io.reactivex.annotations.NonNull
 import io.reactivex.disposables.CompositeDisposable
 
-
+@Deprecated("This is not used anymore, Use MainActivity Instead")
 class LandingActivity : AbstractBaseActivity<ActivityLandingBinding>(), ViewListener {
     companion object {
         private val TAG = LandingActivity::class.java.simpleName
@@ -51,7 +51,7 @@ class LandingActivity : AbstractBaseActivity<ActivityLandingBinding>(), ViewList
         viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(LandingActivityViewModel::class.java)
         viewModel.setFlowCoordinator(MainFlowCoordinator())
         binding?.viewModel = viewModel
-        
+
         handleRouting()
     }
 
@@ -127,18 +127,8 @@ class LandingActivity : AbstractBaseActivity<ActivityLandingBinding>(), ViewList
         val result = CityPickerActivity.handleActivityResult(requestCode, resultCode, data) ?: return
         toast(this, "[cityCode: ${result.cityCode}  ||| countryCode: ${result.countryCode}]")
     }
-//
-//    override fun goToMapActivity() {
-//        viewModel.goToMapActivity()
-//    }
-//
-//    override fun goToCityPicker() {
-//        viewModel.goToCountryPicker()
-//    }
 }
 
 interface ViewListener {
     fun requestLocationPermission()
-//    fun goToCityPicker()
-//    fun goToMapActivity()
 }

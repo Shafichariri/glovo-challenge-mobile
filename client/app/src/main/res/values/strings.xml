@@ -10,10 +10,14 @@
 
     <string name="dialog_location_permission_show_settings_title">Location Permission is needed!</string>
     <string name="dialog_location_permission_show_settings_message">Please open the settings and enable the Location service.</string>
-    <string name="dialog_location_permission_lost_show_title">Location Permission lost!</string>
-    <string name="dialog_location_permission_lost_show_message">Location permission is needed!</string>
+    <string name="dialog_location_permission_lost_show_title">Location Permission Not Set!</string>
+    <string name="dialog_location_permission_lost_show_message">Location permission is needed.</string>
     
     <string name="not_serviceable_message">Sorry! This location is not serviceable yet!</string>
+    <string name="zoom_to_check_service_message">Zoom to check Service</string>
+
+    <string name="dialog_geocoder_failed_title">Geocoder failed</string>
+    <string name="dialog_geocoder_failed_message">Unknown Error</string>
     
     <!-- Map Main Activity -->
     <string name="action_bar_title_map">Map</string>
@@ -23,18 +27,23 @@
     <string name="text_view_city_currency">Currency: %1$s</string>
     <string name="text_view_city_timezone">Timezone: %1$s</string>
     <string name="text_view_city_country">Country: %1$s</string>
-
+    <string name="dialog_city_picker_title">Pick A City</string>
+    <string name="dialog_city_picker_message">Select A City Manually?</string>
+    
+    
     <!-- Landing Activity -->
     <string name="action_bar_title_landing">Welcome</string>
-    <string name="text_view_permission_not_granted">Permission Status: Not Granted</string>
-    <string name="text_view_permission_granted">Permission Status: Granted</string>
-    <string name="button_enable_permission_title">Enable Location Permission</string>
-    <string name="button_open_city_picker">Pick A City Manually</string>
+    <string name="text_view_permission_not_granted">Permission: Not Granted</string>
+    <string name="text_view_permission_granted">Permission: Granted</string>
+    <string name="button_enable_permission_title">Permissions</string>
+    <string name="button_open_city_picker">Pick City</string>
     <string name="button_open_map">Pick A Location</string>
     <string name="text_view_no_location_selected">No Location Selected</string>
+    <string name="text_view_location_selected">Selected: %1$s</string>
     
     <!-- City Picker -->
     <string name="action_bar_title_city_picker">Pick A City</string>
     <string name="dialog_city_selection_title">Select City</string>
     <string name="dialog_city_selection_message">Do you want to select %1$s?</string>
+    
 </resources>

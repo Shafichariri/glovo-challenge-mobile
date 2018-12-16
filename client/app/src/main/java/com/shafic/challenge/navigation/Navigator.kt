@@ -11,6 +11,10 @@ import com.shafic.challenge.ui.map.MainActivity
 import com.shafic.challenge.ui.permission.PermissionsActivity
 import java.lang.ref.WeakReference
 
+/**
+ * Prototype:
+ * Navigator is responsible for handling the step in the navigation process only.
+ * */
 object Navigator : NavigationProvider {
     private val TAG = Navigator.javaClass.simpleName
 
@@ -28,7 +32,6 @@ object Navigator : NavigationProvider {
     fun add(weakActivityReference: WeakReference<AppCompatActivity>) {
         val activity = weakActivityReference.get() ?: return
         val key = activity.simpleClassName()
-        Log.e(TAG, "[ADD] [$key] | [ACTIVE] [$name] --------->")
         map[key] = weakActivityReference
         currentActivityKey = key
     }
@@ -36,42 +39,29 @@ object Navigator : NavigationProvider {
     fun remove(weakActivityReference: WeakReference<AppCompatActivity>) {
         val activity = weakActivityReference.get() ?: return
         val key = activity.simpleClassName()
-        Log.e(TAG, "[REMOVE] [$key]  | [ACTIVE] [$name] --------->")
         map.remove(key)
     }
 
     override fun showMap() {
         val activity = weakActivity?.get() ?: return handleNoActivityReference()
-
-        Log.e(TAG, "SHOW MAP ===> Using [$name]")
-
         val intent = MainActivity.intent(activity)
         activity.startActivity(intent)
     }
 
     override fun showCityPicker(requestCode: Int) {
         val activity = weakActivity?.get() ?: return handleNoActivityReference()
-
-        Log.e(TAG, "SHOW CITY PICKER ===> Using [$name]")
-
         val intent = CityPickerActivity.intent(activity)
         activity.startActivityForResult(intent, requestCode)
     }
 
     override fun showPermissionHandler(requestCode: Int) {
         val activity = weakActivity?.get() ?: return handleNoActivityReference()
-
-        Log.e(TAG, "SHOW PERMISSION HANDLER ===> Using [$name]")
-
         val intent = PermissionsActivity.intent(activity)
         activity.startActivityForResult(intent, requestCode)
     }
 
     override fun finishPermissionHandler(resultCode: Int) {
         val activity = weakActivity?.get() ?: return handleNoActivityReference()
-
-        Log.e(TAG, "FINISH PERMISSION HANDLER ===> Using [$name]")
-
         activity.setResult(resultCode)
         activity.finish()
     }
@@ -79,8 +69,6 @@ object Navigator : NavigationProvider {
     override fun goToAppSettings() {
         val activity = weakActivity?.get() ?: return handleNoActivityReference()
 
-        Log.e(TAG, "GOTO SETTINGS ===> Using [$name]")
-        
         val appSettingsIntent = activity.settingsStarterIntent()
         appSettingsIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         ContextCompat.startActivity(activity, appSettingsIntent, null)
@@ -88,10 +76,10 @@ object Navigator : NavigationProvider {
 
     private fun handleNoActivityReference() {
         if (weakActivity == null) {
-            Log.e(TAG, "WEAK-REFERENCE of Activity is Null")
+            Log.e(TAG, "WEAK-REFERENCE of Activity is Null [KEY: $currentActivityKey]")
             throw RuntimeException("WEAK-REFERENCE of Activity is Null")
         } else if (weakActivity?.get() == null) {
-            Log.e(TAG, "Activity REFERENCEd weakly is Null")
+            Log.e(TAG, "Activity REFERENCEd weakly is Null [KEY: $currentActivityKey]")
             throw RuntimeException("WEAK-REFERENCE of Activity is Null")
         }
     }

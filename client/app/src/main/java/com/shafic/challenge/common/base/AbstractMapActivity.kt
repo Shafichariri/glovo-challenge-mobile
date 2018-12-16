@@ -4,22 +4,24 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.databinding.ViewDataBinding
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolygonOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.OnSuccessListener
+import com.shafic.challenge.R
 import com.shafic.challenge.common.ui.AdvancedGoogleMapFragment
 import com.shafic.challenge.common.util.MapUtil
 import com.shafic.challenge.data.presentation.SimpleCity
+
 
 abstract class AbstractMapActivity<B : ViewDataBinding> : AbstractBaseActivity<B>(), OnMapReadyCallback,
     AdvancedGoogleMapFragment.MapScrollListener {
@@ -30,6 +32,7 @@ abstract class AbstractMapActivity<B : ViewDataBinding> : AbstractBaseActivity<B
     //region ABSTRACT PROPERTIES
     abstract val mapFragmentId: Int
     abstract val requestsUserLocation: Boolean
+    abstract val pinIcon: BitmapDescriptor
     //endregion
 
     //region ABSTRACT METHODS
@@ -56,6 +59,15 @@ abstract class AbstractMapActivity<B : ViewDataBinding> : AbstractBaseActivity<B
     }
     //endregion 
 
+    //region CLICK LISTENERS
+    open fun onMapPolygonClicked(polygon: Polygon) {
+    }
+
+    open fun onMapMarkerClicked(marker: Marker): Boolean {
+        return false
+    }
+
+    //endregion
     private var viewDataBinding: B? = null
     private var mapFragment: AdvancedGoogleMapFragment? = null
         get() {
@@ -96,7 +108,10 @@ abstract class AbstractMapActivity<B : ViewDataBinding> : AbstractBaseActivity<B
     //region OnMapReadyCallback
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+        setMapStyle(map)
         mapFragment?.setMapScrollListener(this)
+        map.setOnPolygonClickListener { onMapPolygonClicked(it) }
+        map.setOnMarkerClickListener { onMapMarkerClicked(it) }
         onMapLoaded(map)
     }
     //endregion
@@ -114,16 +129,20 @@ abstract class AbstractMapActivity<B : ViewDataBinding> : AbstractBaseActivity<B
 
     internal fun addMarker(position: LatLng, tag: String) {
         val marker = map.addMarker(MarkerOptions().position(position))
+        marker.setIcon(pinIcon)
         marker.tag = tag
     }
 
     internal fun addPolygons(list: List<SimpleCity>, showBounds: Boolean) {
+        Log.e("DRAWING", "SIZE: ${list.size} || $showBounds")
         map.clear()
         list.forEach { city ->
             val workingAreas = city.workingArea ?: return@forEach
             workingAreas.forEach { polygon ->
                 if (polygon.isNotEmpty()) {
                     addPolygon(polygon, city.code, showBounds)
+                } else {
+                    Log.e("DRAWING", "WAS EMPTY")
                 }
             }
         }
@@ -197,6 +216,27 @@ abstract class AbstractMapActivity<B : ViewDataBinding> : AbstractBaseActivity<B
         } else {
             onUserLocationPermissionFailure(fineLocationPermissionCheck, coarseLocationPermissionCheck)
         }
+    }
+    //endregion
+
+    //region HELPERS
+    private fun setMapStyle(map: GoogleMap) {
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            val success = map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    this, R.raw.style_json
+                )
+            )
+
+            if (!success) {
+                Log.e("AbstractMapActivity", "Style parsing failed.")
+            }
+        } catch (e: Resources.NotFoundException) {
+            Log.e("AbstractMapActivity", "Can't find style. Error: ", e)
+        }
+
     }
     //endregion
 }

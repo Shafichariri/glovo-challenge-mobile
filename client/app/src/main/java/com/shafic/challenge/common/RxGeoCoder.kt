@@ -89,6 +89,9 @@ class RxGeoCoder private constructor() {
                 return Result(locationInformation, error = null)
 
             } catch (ioException: IOException) {
+                //https://issuetracker.google.com/issues/64418751
+                //https://issuetracker.google.com/issues/64247769
+                
                 // Catch network or other I/O problems.
                 error = LocationInformationError.ServiceNotAvailable
                 Log.e(TAG, error.description, ioException)

@@ -1,16 +1,14 @@
-package com.shafic.challenge.managers
+package com.shafic.challenge.helpers
 
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.PolyUtil
 import com.shafic.challenge.common.util.MapUtil
-import com.shafic.challenge.common.util.MapUtil.Companion.decodePolygon
 import com.shafic.challenge.data.models.City
 import com.shafic.challenge.data.presentation.SimpleCity
 
-class CityManager {
+class CityHelper {
     companion object {
         /**
-         * Filters only the cities if the aprox calculated center of the working areas is within bounds.
+         * Filters only the cities if the approximate calculated center of the working areas is within bounds.
          * 1. Get the Center of the working areas of a city
          * 2. Filters only the centers that are within bounds
          * */
@@ -35,7 +33,7 @@ class CityManager {
                 }
         }
 
-        fun filterByWorkingAreas(list: List<SimpleCity>?, withinBounds: List<LatLng>?): List<SimpleCity>? {
+        fun filterByWorkingAreas(list: List<SimpleCity>?, withinBounds: List<LatLng>?, inverseCheck: Boolean): List<SimpleCity>? {
 
             val visibleBounds = withinBounds ?: return null
             val simpleCities = list ?: return null
@@ -45,7 +43,7 @@ class CityManager {
                     val areas = city.workingArea
                         ?.filter { area ->
                             //Filter the City's working areas that are visible within the given bounds
-                            return@filter MapUtil.isPolygonWithinBounds(visibleBounds, area)
+                            return@filter isAreaVisible(visibleBounds, area, inverseCheck = inverseCheck)
                         }
                         ?: return@mapNotNull null
 
@@ -54,10 +52,18 @@ class CityManager {
                 }
         }
 
+        private fun isAreaVisible(visibleBounds: List<LatLng>, area: List<LatLng>, inverseCheck: Boolean): Boolean {
+            if (!inverseCheck) {
+                return MapUtil.isPolygonWithinBounds(visibleBounds, area)
+            }
+            return MapUtil.isPolygonWithinBounds(visibleBounds, area) ||
+                    MapUtil.isPolygonWithinBounds(area, visibleBounds)
+        }
+
         fun filterBy(latLng: LatLng, andCountryCode: String?, list: List<SimpleCity>?): List<SimpleCity>? {
             val countryCode = andCountryCode ?: return null
             val cities = list ?: return null
-            
+
             return cities
                 .filter { it.countryCode == countryCode }.mapNotNull { city ->
                     val workingArea = city.workingArea?.filter { workingArea ->
@@ -69,9 +75,9 @@ class CityManager {
                     } else {
                         return@mapNotNull null
                     }
-                }    
+                }
         }
-        
+
         fun convertToDecodedCities(cities: List<City>): List<SimpleCity> {
             return cities.map {
                 //Decode working areas
