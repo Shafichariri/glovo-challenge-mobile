@@ -56,6 +56,9 @@ class CityPickerViewModel : BaseViewModel() {
         }
     }
 
+    fun reset() {
+        isLoading.value = false
+    }
 
     fun loadData() {
         isLoading.value = true

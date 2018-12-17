@@ -18,6 +18,9 @@
 
     <string name="dialog_geocoder_failed_title">Geocoder failed</string>
     <string name="dialog_geocoder_failed_message">Unknown Error</string>
+
+    <string name="error">Error</string>
+    <string name="server_not_reachable">Seems that the Server Is not reachable, try again?</string>
     
     <!-- Map Main Activity -->
     <string name="action_bar_title_map">Map</string>

@@ -8,7 +8,9 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import com.shafic.challenge.R
+import com.shafic.challenge.common.BaseEvent
 import com.shafic.challenge.common.Dialogs
+import com.shafic.challenge.common.RxBus
 import com.shafic.challenge.common.base.AbstractBaseActivity
 import com.shafic.challenge.common.base.BaseAdapter
 import com.shafic.challenge.data.models.City
@@ -16,6 +18,8 @@ import com.shafic.challenge.databinding.ActivityCityPickerBinding
 import com.shafic.challenge.injection.ViewModelFactory
 import com.shafic.challenge.ui.cityPicker.list.CitiesAdapter
 import com.shafic.challenge.ui.cityPicker.list.CityPickerAdapterItem
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 
 class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
     BaseAdapter.OnItemClickListener<CityPickerAdapterItem> {
@@ -48,7 +52,8 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
     }
 
     private lateinit var viewModel: CityPickerViewModel
-
+    private val compositeDisposable = CompositeDisposable()
+    
     override val layoutId: Int
         get() = R.layout.activity_city_picker
 
@@ -57,6 +62,7 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
     }
 
     override fun onCreated(savedInstanceState: Bundle?) {
+        setupNetworkErrorListener()
         actionBar?.title = resources.getString(R.string.action_bar_title_city_picker)
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -71,6 +77,11 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
         viewModel.loadData()
     }
 
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+        super.onDestroy()
+    }
+    
     private fun setupRecyclerView() {
         val binding = viewBinding() ?: return
         val recyclerView = binding.recyclerView
@@ -115,4 +126,31 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
         viewModel.onAdapterItemClick(item)
     }
     //endregion
+
+
+    private fun showNetworkDialog() {
+        val title = getString(R.string.error)
+        val unknownError = getString(R.string.server_not_reachable)
+        val alertDialog = Dialogs.createDefault(this, title = title, message = unknownError, positiveAction = {
+            viewModel.loadData()
+        })
+        alertDialog?.show()
+    }
+    
+    private fun setupNetworkErrorListener() {
+        val disposable = RxBus.events()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ event: BaseEvent? ->
+                when (event) {
+                    is BaseEvent.ConnectionFailed -> {
+                        //Error Info: val error = event.error
+                        viewModel.reset()
+                        showNetworkDialog()
+                    }
+                }
+            }, { throwable: Throwable? ->
+                throwable?.printStackTrace()
+            })
+        compositeDisposable.add(disposable)
+    }
 }

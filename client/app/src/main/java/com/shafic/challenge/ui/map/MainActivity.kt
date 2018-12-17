@@ -100,6 +100,8 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     }
 
     override fun onCreated(savedInstanceState: Bundle?) {
+        setupNetworkErrorListener()
+
         actionBar?.title = resources.getString(R.string.action_bar_title_landing)
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -183,7 +185,9 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
             this.viewBinding()?.serviceable = serviceable
             if (serviceable == false) {
                 viewBinding()?.textviewCenterServiceable?.text = getString(R.string.not_serviceable_message)
-                dialogSubject.onNext(DialogType.CityPicker(null))
+                if(viewModel.isAreaVisibleEnough(map.cameraPosition.zoom)) {
+                    dialogSubject.onNext(DialogType.CityPicker(null))
+                }
             }
         })
         viewModel.readyLiveData().observe(this, android.arch.lifecycle.Observer { ready ->
@@ -293,7 +297,34 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
         alertDialog?.show()
     }
 
+
+    private fun showNetworkDialog() {
+        val title = getString(R.string.error)
+        val unknownError = getString(R.string.server_not_reachable)
+        val alertDialog = Dialogs.createDefault(this, title = title, message = unknownError, positiveAction = {
+            viewModel.loadCities()
+        })
+        alertDialog?.show()
+    }
+
     private fun isLocationPermissionGranted(): Boolean {
         return RealRxPermission.getInstance(application).isGranted(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
+
+    private fun setupNetworkErrorListener() {
+        val disposable = RxBus.events()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ event: BaseEvent? ->
+                when (event) {
+                    is BaseEvent.ConnectionFailed -> {
+                        //Error Info: val error = event.error
+                        viewModel.reset()
+                        showNetworkDialog()
+                    }
+                }
+            }, { throwable: Throwable? ->
+                throwable?.printStackTrace()
+            })
+        compositeDisposable.add(disposable)
     }
 }

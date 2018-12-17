@@ -5,6 +5,7 @@ import com.shafic.challenge.BuildConfig
 import com.shafic.challenge.data.api.CitiesService
 import com.shafic.challenge.data.api.CountriesService
 import com.shafic.challenge.injection.component.ApiComponent
+import com.shafic.challenge.network.ErrorInterceptor
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -27,11 +28,13 @@ internal object ApiModule : ApiComponent {
 
     override val okHttpClient = OkHttpClient.Builder()
         .addNetworkInterceptor(loggingInterceptor)
+        .addInterceptor(ErrorInterceptor())
         .build()
 
     override val gson = GsonBuilder().create()
 
     override val retrofit = Retrofit.Builder()
+        .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
         .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
         .baseUrl(API_BASE_URL)

@@ -11,12 +11,9 @@ import com.shafic.challenge.common.RxGeoCoder
 import com.shafic.challenge.common.base.BaseViewModel
 import com.shafic.challenge.common.util.Utilities
 import com.shafic.challenge.data.models.City
-import com.shafic.challenge.data.presentation.MapDataPresentation
-import com.shafic.challenge.data.presentation.RegionInfo
-import com.shafic.challenge.data.presentation.ServiceableLocation
-import com.shafic.challenge.data.presentation.SimpleCity
-import com.shafic.challenge.injection.module.app
+import com.shafic.challenge.data.presentation.*
 import com.shafic.challenge.helpers.CityHelper
+import com.shafic.challenge.injection.module.app
 import com.shafic.challenge.navigation.coordinators.MainFlowProvider
 import com.shafic.challenge.ui.cityPicker.CityPickerActivity
 import com.shafic.challenge.ui.map.useCase.*
@@ -84,6 +81,10 @@ class MainActivityViewModel : BaseViewModel() {
         setupLocationChangedObservable()
     }
 
+    fun reset() {
+        isLoadingLiveData.value = false
+    }
+    
     fun readyLiveData(): LiveData<Boolean> {
         return readyLiveData
     }
@@ -264,7 +265,7 @@ class MainActivityViewModel : BaseViewModel() {
         mapReadyObservable.onComplete()
     }
 
-    private fun loadCities() {
+    fun loadCities() {
         val disposable = fetchCitiesUseCase.getCities()
             .doOnSuccess { cities ->
                 this.cities = cities.toMutableList()
@@ -287,5 +288,9 @@ class MainActivityViewModel : BaseViewModel() {
     fun requestMapDisplayInfo(zoom: Float, center: LatLng, visibleRegionPolygon: List<LatLng>?) {
         val regionInfo = RegionInfo(zoom, center, visibleRegionPolygon)
         regionSubject.onNext(regionInfo)
+    }
+    
+    fun isAreaVisibleEnough(zoom: Float): Boolean {
+        return ZoomContext.isAreaVisibleEnough(zoom)    
     }
 }

@@ -29,5 +29,9 @@ enum class ZoomContext {
         fun shouldCheckInverse(zoom: Float): Boolean {
             return (zoom > 12.0)
         }
+
+        fun isAreaVisibleEnough(zoom: Float): Boolean {
+            return (zoom > 11.0)
+        }
     }
 }
