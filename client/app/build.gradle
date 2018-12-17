@@ -43,6 +43,7 @@ android {
             signingConfig signingConfigs.debug
 
             Properties props = loadPropertiesFromFile("./config/dev.properties")
+            resValue "string", "google_maps_key", props["google_maps_key"]
             buildConfigField("String", "BASE_URL", props["base_url"])
             buildConfigField("String", "API_PATH_EXTENSION", props["api_path_extension"])
         }
@@ -53,6 +54,7 @@ android {
             minifyEnabled true
 
             Properties props = loadPropertiesFromFile("./config/prod.properties")
+            resValue "string", "google_maps_key", props["google_maps_key"]
             buildConfigField("String", "BASE_URL", props["base_url"])
             buildConfigField("String", "API_PATH_EXTENSION", props["api_path_extension"])
 
