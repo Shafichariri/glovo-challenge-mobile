@@ -7,7 +7,7 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import com.shafic.challenge.R
-import com.shafic.challenge.common.Dialogs
+import com.shafic.challenge.common.dialogs.Dialogs
 import com.shafic.challenge.common.base.AbstractBaseActivity
 import com.shafic.challenge.common.toast
 import com.shafic.challenge.databinding.ActivityLandingBinding

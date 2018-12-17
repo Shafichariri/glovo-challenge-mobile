@@ -266,6 +266,7 @@ class MainActivityViewModel : BaseViewModel() {
     }
 
     fun loadCities() {
+        isLoadingLiveData.value = true
         val disposable = fetchCitiesUseCase.getCities()
             .doOnSuccess { cities ->
                 this.cities = cities.toMutableList()
@@ -278,11 +279,13 @@ class MainActivityViewModel : BaseViewModel() {
     private fun onRetrieveCitiesSuccess() {
         areasReadyObservable.onNext(true)
         areasReadyObservable.onComplete()
+        isLoadingLiveData.value = false
     }
 
     private fun onRetrieveCitiesError(throwable: Throwable) {
         areasReadyObservable.onNext(false)
         throwable.printStackTrace()
+        isLoadingLiveData.value = false
     }
 
     fun requestMapDisplayInfo(zoom: Float, center: LatLng, visibleRegionPolygon: List<LatLng>?) {

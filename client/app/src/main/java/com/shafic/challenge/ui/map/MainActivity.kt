@@ -16,6 +16,8 @@ import com.google.android.gms.maps.model.Polygon
 import com.shafic.challenge.R
 import com.shafic.challenge.common.*
 import com.shafic.challenge.common.base.AbstractMapActivity
+import com.shafic.challenge.common.dialogs.DialogProvider
+import com.shafic.challenge.common.dialogs.DialogProviderImplementation
 import com.shafic.challenge.common.ui.AdvancedGoogleMapFragment
 import com.shafic.challenge.common.util.MapUtil
 import com.shafic.challenge.common.util.Utilities
@@ -56,6 +58,7 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     private lateinit var viewModel: MainActivityViewModel
     private val dialogSubject: BehaviorSubject<DialogType> = BehaviorSubject.create()
     private val compositeDisposable = CompositeDisposable()
+    private val dialogProvider: DialogProvider by lazy { DialogProviderImplementation(context = this) }
 
     override val pinIcon: BitmapDescriptor by lazy {
         return@lazy Utilities.loadBitmapFromVector(
@@ -84,7 +87,7 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
         if (isGranted) {
             setupUserLocationListener()
         } else {
-            showCityPickerDialog()
+            dialogProvider.createCityPickerDialog { viewModel.showCityPickerWithResult() }?.show()
         }
         updateDisplayData()
     }
@@ -141,7 +144,6 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
 
 
     override fun onGoogleServicesNotAvailable() {
-        //TODO: Show a terminal Dialog telling the user that the App needs PlayServices to work
         toast(this, "The App needs PlayServices to work Retry or Quit App")
     }
 
@@ -151,12 +153,11 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
             moveTo(latLng = latLng, zoom = 16.0f)
             requestLocationInformation(latLng)
         }
-        //TODO: handle error if any
     }
 
     override fun onUserLocationPermissionFailure(fineLocationPermissionError: Int, coarseLocationPermissionError: Int) {
         //Note: This activity does not handle location permissions by itself, it delegates Action to another Activity
-        showNeedsPermissionAlert()
+        dialogProvider.createNeedsPermissionAlert { viewModel.handlePermissions() }?.show()
     }
 
     override fun onMapScrollEnded() {
@@ -185,7 +186,7 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
             this.viewBinding()?.serviceable = serviceable
             if (serviceable == false) {
                 viewBinding()?.textviewCenterServiceable?.text = getString(R.string.not_serviceable_message)
-                if(viewModel.isAreaVisibleEnough(map.cameraPosition.zoom)) {
+                if (viewModel.isAreaVisibleEnough(map.cameraPosition.zoom)) {
                     dialogSubject.onNext(DialogType.CityPicker(null))
                 }
             }
@@ -253,31 +254,11 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 when (it) {
-                    is DialogType.CityPicker -> showCityPickerDialog()
-                    is DialogType.GeoCoderError -> showGeoCoderErrorDialog(it.message)
+                    is DialogType.CityPicker -> dialogProvider.createCityPickerDialog { viewModel.showCityPickerWithResult() }?.show()
+                    is DialogType.GeoCoderError -> dialogProvider.createGeoCoderErrorDialog(it.message)?.show()
                 }
             }, { it.printStackTrace() })
         compositeDisposable.add(disposable)
-    }
-
-    private fun showNeedsPermissionAlert() {
-        val title = getString(R.string.dialog_location_permission_lost_show_title)
-        val message = getString(R.string.dialog_location_permission_lost_show_message)
-        val alertDialog = Dialogs.createNeutral(this, title = title, message = message,
-            neutralAction = {
-                viewModel.handlePermissions()
-            })
-        alertDialog?.show()
-    }
-
-    private fun showCityPickerDialog() {
-        val title = getString(R.string.dialog_city_picker_title)
-        val message = getString(R.string.dialog_city_picker_message)
-        val alertDialog = Dialogs.createDefault(this, title = title, message = message,
-            positiveAction = {
-                viewModel.showCityPickerWithResult()
-            })
-        alertDialog?.show()
     }
 
     private fun updateDisplayData() {
@@ -288,23 +269,6 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
         viewModel.setIsPermissionGranted(isGranted)
         val binding = viewBinding()
         binding?.viewModel = viewModel
-    }
-
-    private fun showGeoCoderErrorDialog(message: String?) {
-        val title = getString(R.string.dialog_geocoder_failed_title)
-        val unknownError = getString(R.string.dialog_geocoder_failed_message)
-        val alertDialog = Dialogs.createNeutral(this, title = title, message = message ?: unknownError)
-        alertDialog?.show()
-    }
-
-
-    private fun showNetworkDialog() {
-        val title = getString(R.string.error)
-        val unknownError = getString(R.string.server_not_reachable)
-        val alertDialog = Dialogs.createDefault(this, title = title, message = unknownError, positiveAction = {
-            viewModel.loadCities()
-        })
-        alertDialog?.show()
     }
 
     private fun isLocationPermissionGranted(): Boolean {
@@ -319,7 +283,7 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
                     is BaseEvent.ConnectionFailed -> {
                         //Error Info: val error = event.error
                         viewModel.reset()
-                        showNetworkDialog()
+                        dialogProvider.createNetworkErrorDialog { viewModel.loadCities() }?.show()
                     }
                 }
             }, { throwable: Throwable? ->

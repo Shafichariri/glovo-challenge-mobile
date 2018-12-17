@@ -1,4 +1,4 @@
-package com.shafic.challenge.common
+package com.shafic.challenge.common.dialogs
 
 import android.content.Context
 import android.support.v7.app.AlertDialog
@@ -18,7 +18,7 @@ class Dialogs {
                     //EMPTY BLOCK
                 }
             } else null
-            
+
             return create(
                 context,
                 neutralButton = neutralButton,
@@ -37,7 +37,7 @@ class Dialogs {
             positiveButton: String? = context?.getString(R.string.ok),
             negativeButton: String? = context?.getString(R.string.cancel)
         ): AlertDialog? {
-            
+
             val emptyNegativeAction: (() -> Unit)? = if (negativeAction == null) {
                 {
                     //EMPTY BLOCK

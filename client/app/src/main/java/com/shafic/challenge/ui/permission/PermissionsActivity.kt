@@ -7,8 +7,9 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import com.shafic.challenge.R
-import com.shafic.challenge.common.Dialogs
 import com.shafic.challenge.common.base.AbstractBaseActivity
+import com.shafic.challenge.common.dialogs.DialogProvider
+import com.shafic.challenge.common.dialogs.DialogProviderImplementation
 import com.shafic.challenge.databinding.ActivityPermissionsBinding
 import com.shafic.challenge.injection.ViewModelFactory
 import com.shafic.challenge.navigation.coordinators.MainFlowCoordinator
@@ -37,6 +38,7 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
             //Return TRUE if permission is granted
             return resultCode == GRANTED_RESULT_CODE
         }
+
         //TODO: Pass In Permission name arguments
         fun intent(context: Context): Intent = Intent(context, PermissionsActivity::class.java)
     }
@@ -44,6 +46,7 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
     @NonNull
     private val compositeDisposable = CompositeDisposable()
     private lateinit var viewModel: PermissionsViewModel
+    private val dialogProvider: DialogProvider by lazy { DialogProviderImplementation(context = this) }
 
     override val layoutId: Int
         get() = R.layout.activity_permissions
@@ -98,24 +101,11 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
                 viewModel.finishPermissionWithResult(DENIED_RESULT_CODE)
             }
             Permission.State.DENIED_NOT_SHOWN, Permission.State.REVOKED_BY_POLICY -> {
-                showAppSettingsLauncherDialog()
+                dialogProvider.createAppSettingsLauncherDialog(positiveAction = { viewModel.goToSettings() },
+                    negativeAction = {
+                        viewModel.finishPermissionWithResult(DENIED_RESULT_CODE)
+                    })?.show()
             }
         }
-
-    }
-
-    private fun showAppSettingsLauncherDialog() {
-        //TODO: Delegate message and title (also Parameters to intent) 
-        val alertDialog = Dialogs.createDefault(context = this,
-            message = getString(R.string.dialog_location_permission_show_settings_message),
-            title = getString(R.string.dialog_location_permission_show_settings_title),
-            negativeButton = getString(R.string.dialog_negative_button_title),
-            positiveButton = getString(R.string.dialog_positive_button_title),
-            positiveAction = { viewModel.goToSettings() },
-            negativeAction = {
-                viewModel.finishPermissionWithResult(DENIED_RESULT_CODE)
-            })
-
-        alertDialog?.show()
     }
 }

@@ -9,10 +9,11 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import com.shafic.challenge.R
 import com.shafic.challenge.common.BaseEvent
-import com.shafic.challenge.common.Dialogs
 import com.shafic.challenge.common.RxBus
 import com.shafic.challenge.common.base.AbstractBaseActivity
 import com.shafic.challenge.common.base.BaseAdapter
+import com.shafic.challenge.common.dialogs.DialogProvider
+import com.shafic.challenge.common.dialogs.DialogProviderImplementation
 import com.shafic.challenge.data.models.City
 import com.shafic.challenge.databinding.ActivityCityPickerBinding
 import com.shafic.challenge.injection.ViewModelFactory
@@ -53,7 +54,8 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
 
     private lateinit var viewModel: CityPickerViewModel
     private val compositeDisposable = CompositeDisposable()
-    
+    private val dialogProvider: DialogProvider by lazy { DialogProviderImplementation(context = this) }
+
     override val layoutId: Int
         get() = R.layout.activity_city_picker
 
@@ -81,7 +83,7 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
         compositeDisposable.dispose()
         super.onDestroy()
     }
-    
+
     private fun setupRecyclerView() {
         val binding = viewBinding() ?: return
         val recyclerView = binding.recyclerView
@@ -100,17 +102,13 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
 
     private fun handleCitySelection(city: City?) {
         val city = city ?: return
-        showAlertSelectionValidation(city = city)
-    }
-
-    private fun showAlertSelectionValidation(city: City) {
-        val alertDialog = Dialogs.createDefault(context = this,
-            message = getString(R.string.dialog_city_selection_message, city.name),
-            title = getString(R.string.dialog_city_selection_title),
-            negativeAction = { viewModel.cancelSelection() },
-            positiveAction = { finishActivityWithSelectionResult(city) })
-
-        alertDialog?.show()
+        dialogProvider.createAlertSelectionValidation(city = city,
+            positiveAction = {
+                finishActivityWithSelectionResult(city)
+            },
+            negativeAction = {
+                viewModel.cancelSelection()
+            })?.show()
     }
 
     private fun finishActivityWithSelectionResult(city: City) {
@@ -127,16 +125,6 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
     }
     //endregion
 
-
-    private fun showNetworkDialog() {
-        val title = getString(R.string.error)
-        val unknownError = getString(R.string.server_not_reachable)
-        val alertDialog = Dialogs.createDefault(this, title = title, message = unknownError, positiveAction = {
-            viewModel.loadData()
-        })
-        alertDialog?.show()
-    }
-    
     private fun setupNetworkErrorListener() {
         val disposable = RxBus.events()
             .observeOn(AndroidSchedulers.mainThread())
@@ -145,7 +133,7 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
                     is BaseEvent.ConnectionFailed -> {
                         //Error Info: val error = event.error
                         viewModel.reset()
-                        showNetworkDialog()
+                        dialogProvider.createNetworkErrorDialog { viewModel.loadData() }?.show()
                     }
                 }
             }, { throwable: Throwable? ->
