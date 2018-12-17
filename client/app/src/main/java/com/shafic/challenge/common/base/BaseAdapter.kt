@@ -23,10 +23,8 @@ abstract class BaseAdapter<VH : BaseViewHolder, ITEM : AdapterItem>(
     var onItemClickListener: OnItemClickListener<ITEM>? = null
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        if (holder.itemView != null) {
-            if (onItemClickListener != null) {
-                holder.itemView.setOnClickListener { onItemClickListener!!.onItemClick(position, data[position]) }
-            }
+        if (onItemClickListener != null) {
+            holder.itemView.setOnClickListener { onItemClickListener!!.onItemClick(position, data[position]) }
         }
     }
 

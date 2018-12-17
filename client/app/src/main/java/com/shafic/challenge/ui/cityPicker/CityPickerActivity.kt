@@ -16,7 +16,6 @@ import com.shafic.challenge.databinding.ActivityCityPickerBinding
 import com.shafic.challenge.injection.ViewModelFactory
 import com.shafic.challenge.ui.cityPicker.list.CitiesAdapter
 import com.shafic.challenge.ui.cityPicker.list.CityPickerAdapterItem
-import com.shafic.challenge.ui.landing.LandingActivity
 
 class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
     BaseAdapter.OnItemClickListener<CityPickerAdapterItem> {
@@ -28,7 +27,7 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
         const val EXTRA_KEY_CITY_CODE = "CITY_CODE"
         const val EXTRA_KEY_COUNTRY_CODE = "CITY_COUNTRY_CODE"
 
-        private val TAG = LandingActivity::class.java.simpleName
+        private val TAG = CityPickerActivity::class.java.simpleName
 
         fun shouldHandleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
             return SELECTION_REQUEST_CODE == requestCode && SELECTION_RESULT_CODE == resultCode &&
@@ -37,8 +36,8 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
 
         fun handleActivityResult(requestCode: Int, resultCode: Int, data: Intent?): SelectedItem? {
             val data = data ?: return null
-            if (!shouldHandleActivityResult(requestCode,resultCode,data)) {
-                return null    
+            if (!shouldHandleActivityResult(requestCode, resultCode, data)) {
+                return null
             }
             val cityCode = data.getStringExtra(CityPickerActivity.EXTRA_KEY_CITY_CODE)
             val countryCode = data.getStringExtra(CityPickerActivity.EXTRA_KEY_COUNTRY_CODE)

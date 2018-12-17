@@ -30,6 +30,5 @@ class CustomBindingAdapter {
         fun setViewElevation(view: AppCompatImageView, @DimenRes dimenRes: Int) {
             ViewCompat.setElevation(view, view.resources.getDimension(dimenRes))
         }
-        
     }
 }

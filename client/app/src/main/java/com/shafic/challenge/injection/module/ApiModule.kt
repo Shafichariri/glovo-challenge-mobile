@@ -1,10 +1,10 @@
 package com.shafic.challenge.injection.module
 
 import com.google.gson.GsonBuilder
+import com.shafic.challenge.BuildConfig
 import com.shafic.challenge.data.api.CitiesService
 import com.shafic.challenge.data.api.CountriesService
 import com.shafic.challenge.injection.component.ApiComponent
-import com.shafic.newassignment.network.NetworkConstants
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -18,6 +18,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 fun api(): ApiComponent = ApiComponent.instance
 
 internal object ApiModule : ApiComponent {
+    private val API_BASE_URL by lazy {
+        BuildConfig.BASE_URL + BuildConfig.API_PATH_EXTENSION
+    }
 
     val loggingInterceptor = HttpLoggingInterceptor()
         .setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -31,7 +34,7 @@ internal object ApiModule : ApiComponent {
     override val retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
         .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-        .baseUrl(NetworkConstants.API_BASE_URL)
+        .baseUrl(API_BASE_URL)
         .build()
 
 

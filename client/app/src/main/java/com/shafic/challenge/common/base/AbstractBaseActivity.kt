@@ -3,8 +3,6 @@ package com.shafic.challenge.common.base
 import android.databinding.ViewDataBinding
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import com.shafic.challenge.common.simpleClassName
 import com.shafic.challenge.navigation.Navigator
 import java.lang.ref.WeakReference
 
@@ -28,49 +26,40 @@ abstract class AbstractBaseActivity<B : ViewDataBinding> : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //This will add instance weak reference to th navigator (following Add calls will replace)
-        Navigator.add(weakThis!! as WeakReference<AppCompatActivity>)
-        
+        updateNavigatorState(Action.add)
+
         viewDataBinding = onCreateViewDataBinding(savedInstanceState)
         onCreated(savedInstanceState)
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun onStart() {
-        Log.e("TESTING","onStart: ${weakThis!!.get()?.simpleClassName()}")
         updateNavigatorState(Action.add)
         super.onStart()
     }
 
-    @Suppress("UNCHECKED_CAST")
     override fun onStop() {
-        Log.e("TESTING","onStop: ${weakThis!!.get()?.simpleClassName()}")
         updateNavigatorState(Action.remove)
         super.onStop()
     }
 
-    override fun onPause() {
-        Log.e("TESTING","onPause: ${weakThis!!.get()?.simpleClassName()}")
-        super.onPause()
-    }
-
     override fun onResume() {
         updateNavigatorState(Action.add)
-        Log.e("TESTING","onResume: ${weakThis!!.get()?.simpleClassName()}")
         super.onResume()
     }
-    
+
+    @Suppress("UNCHECKED_CAST")
     private fun updateNavigatorState(action: Action) {
         when (action) {
             Action.add -> Navigator.add(weakThis!! as WeakReference<AppCompatActivity>)
             Action.remove -> Navigator.remove(weakThis!! as WeakReference<AppCompatActivity>)
         }
     }
-    
+
     protected fun viewBinding(): B? {
         return viewDataBinding
     }
-    
-    
+
+
     private enum class Action {
         add,
         remove
