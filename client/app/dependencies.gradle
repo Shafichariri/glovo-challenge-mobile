@@ -1,0 +1,66 @@
+ext {
+    project.ext {
+        androidSupportVersion = '28.0.0'
+        retrofitVersion = '2.5.0'
+        okhttpVersion = '3.12.0'
+        lifecycleVersion = '1.1.1'
+        rxAndroidVersion = '2.1.0'
+        rxJavaVersion = '2.2.4'
+        rxKotlinVersion = '2.3.0'
+    }
+    
+    //KAPT
+    annotationProcessors = [
+            lifecycleCompiler: "android.arch.lifecycle:compiler:$project.lifecycleVersion"
+    ]
+
+    kotlinDependencies = [
+            kotlin: "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$project.kotlinVersion"
+    ]
+
+    archComponentsDependencies = [
+            lifecycleRuntime   : "android.arch.lifecycle:runtime:$project.lifecycleVersion",
+            lifecycleExtensions: "android.arch.lifecycle:extensions:$project.lifecycleVersion"
+    ]
+
+    mapsDependencies = [
+            mapSevices      : "com.google.android.gms:play-services-maps:16.0.0",
+            locationServices: "com.google.android.gms:play-services-location:16.0.0",
+            mapUitls        : "com.google.maps.android:android-maps-utils:0.5+"
+    ]
+
+    networkDependencies = [
+            retrofit             : "com.squareup.retrofit2:retrofit:${project.retrofitVersion}",
+            retrofitGsonConverter: "com.squareup.retrofit2:converter-gson:${project.retrofitVersion}",
+            retrofitRxJavaAdapter: "com.squareup.retrofit2:adapter-rxjava2:${project.retrofitVersion}",
+            okHttp3              : "com.squareup.okhttp3:okhttp:${project.okhttpVersion}",
+            okHttp3Logging       : "com.squareup.okhttp3:logging-interceptor:${project.okhttpVersion}",
+            parser               : 'com.google.code.gson:gson:2.8.5'
+    ]
+
+    networkTestingDependencies = [
+            mockWebServer: "com.squareup.okhttp3:mockwebserver:$project.okhttpVersion"
+    ]
+
+    rxJavaDependencies = [
+            rxJava   : "io.reactivex.rxjava2:rxjava:${project.rxJavaVersion}",
+            rxKotlin : "io.reactivex.rxjava2:rxkotlin:${project.rxKotlinVersion}",
+            rxAndroid: "io.reactivex.rxjava2:rxandroid:${project.rxAndroidVersion}"
+    ]
+
+    androidSupportDependencies = [
+            appCompat       : "com.android.support:appcompat-v7:$project.androidSupportVersion",
+            constriantLayout: "com.android.support.constraint:constraint-layout:1.1.3",
+            supportV4       : "com.android.support:support-v4:$project.androidSupportVersion",
+            vectors         : "com.android.support:animated-vector-drawable:$project.androidSupportVersion",
+            mediaCompat     : "com.android.support:support-media-compat:$project.androidSupportVersion",
+            recyclerView    : "com.android.support:recyclerview-v7:$project.androidSupportVersion"
+    ]
+
+    othersDependencies = [
+            rxPermission        : "com.vanniktech:rxpermission:0.6.0",
+            rxPermissionSnapshot: "com.vanniktech:rxpermission:0.7.0-SNAPSHOT"
+    ]
+
+
+}

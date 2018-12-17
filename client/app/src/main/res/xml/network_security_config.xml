@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <domain-config cleartextTrafficPermitted="true">
-        <!-- (Since server is host locally on the machine) -->
-        <!-- Enables runs on Simulators/Emulators -->
+        <!-- (Since server is hosted locally on the machine) -->
+
+        <!-- "10.0.2.2" Enables runs on Simulators/Emulators -->
         <domain includeSubdomains="true">10.0.2.2</domain>
+
         <!-- Add the Machine Specific IP to enable Running on Devices connected to the same WIFI -->
-        <domain includeSubdomains="true">192.168.43.146</domain>
-        <domain includeSubdomains="true">192.168.2.220</domain>
-        <!-- Also Update base_url dev.properties -->
+        <domain includeSubdomains="true">10.88.24.71</domain>
+
+        <!-- Also Note: -->
+        <!-- Update base_url dev.properties or prod.properties -->
     </domain-config>
 </network-security-config>

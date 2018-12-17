@@ -1,3 +1,4 @@
+
 # Add project specific ProGuard rules here.
 # You can control the set of applied configuration files using the
 # proguardFiles setting in build.gradle.
@@ -42,3 +43,8 @@
 
 # Top-level functions that can only be used by Kotlin.
 -dontwarn retrofit2.-KotlinExtensions
+
+# OkHttp3
+-dontwarn okhttp3.**
+-dontwarn okio.**
+
