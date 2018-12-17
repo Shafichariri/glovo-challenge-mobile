@@ -20,7 +20,7 @@ import com.shafic.challenge.common.dialogs.DialogProvider
 import com.shafic.challenge.common.dialogs.DialogProviderImplementation
 import com.shafic.challenge.common.ui.AdvancedGoogleMapFragment
 import com.shafic.challenge.common.util.MapUtil
-import com.shafic.challenge.common.util.Utilities
+import com.shafic.challenge.common.util.Util
 import com.shafic.challenge.data.presentation.MapDataPresentation
 import com.shafic.challenge.data.presentation.ServiceableLocation
 import com.shafic.challenge.databinding.ActivityMainBinding
@@ -61,7 +61,7 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     private val dialogProvider: DialogProvider by lazy { DialogProviderImplementation(context = this) }
 
     override val pinIcon: BitmapDescriptor by lazy {
-        return@lazy Utilities.loadBitmapFromVector(
+        return@lazy Util.loadBitmapFromVector(
             applicationContext,
             R.drawable.v_icon_pin_medium_selected,
             R.color.colorPrimary

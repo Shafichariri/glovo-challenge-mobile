@@ -14,6 +14,10 @@ import java.lang.ref.WeakReference
 /**
  * Prototype:
  * Navigator is responsible for handling the step in the navigation process only.
+ *
+ * A better implementation would be to lose the map<String,weakRef> (with add and remove)
+ * and instead have the class be instantiated with an [weakRef]Activity (and destroyed using live data lifecycle-aware components)
+ * whenever an activity is started, so each of our activities would have it's own navigation-coordinator.
  * */
 object Navigator : NavigationProvider {
     private val TAG = Navigator.javaClass.simpleName

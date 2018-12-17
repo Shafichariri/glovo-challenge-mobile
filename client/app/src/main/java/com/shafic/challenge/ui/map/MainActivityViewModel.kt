@@ -9,7 +9,7 @@ import com.shafic.challenge.R
 import com.shafic.challenge.common.Optional
 import com.shafic.challenge.common.RxGeoCoder
 import com.shafic.challenge.common.base.BaseViewModel
-import com.shafic.challenge.common.util.Utilities
+import com.shafic.challenge.common.util.Util
 import com.shafic.challenge.data.models.City
 import com.shafic.challenge.data.presentation.*
 import com.shafic.challenge.helpers.CityHelper
@@ -68,10 +68,10 @@ class MainActivityViewModel : BaseViewModel() {
             field = value
             var displayName = value?.name
             if (displayName != null) {
-                displayName = Utilities.formatString(R.string.text_view_location_selected, displayName)
+                displayName = Util.formatString(R.string.text_view_location_selected, displayName)
             }
 
-            selectedCityLiveData.value = Utilities.stringOrDefualt(displayName, R.string.text_view_no_location_selected)
+            selectedCityLiveData.value = Util.stringOrDefualt(displayName, R.string.text_view_no_location_selected)
         }
 
     init {

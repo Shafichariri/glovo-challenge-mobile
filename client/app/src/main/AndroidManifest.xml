@@ -32,9 +32,6 @@
         <activity
             android:name=".ui.permission.PermissionsActivity"
             android:theme="@style/AppThemeTransparent" />
-        <activity
-            android:name=".ui.landing.LandingActivity"
-            android:screenOrientation="portrait"></activity>
 
         <!-- Maps Key -->
         <meta-data

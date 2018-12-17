@@ -15,7 +15,7 @@ import android.support.v4.content.ContextCompat
 import com.shafic.challenge.common.tint
 import com.shafic.challenge.injection.module.app
 
-class Utilities {
+class Util {
     companion object {
 
         fun formatString(@StringRes stringRes: Int, arg: String): String {
@@ -64,7 +64,7 @@ class Utilities {
                     VectorDrawableCompat.create(context.resources, vectorDrawableId, context.resources.newTheme())
                 drawable?.tint(context, tintColorResId)
                 if (drawable is VectorDrawableCompat) {
-                    return Utilities.getBitmap(vectorDrawable = drawable)
+                    return Util.getBitmap(vectorDrawable = drawable)
                 } else if (drawable is BitmapDrawable) {
                     return drawable.bitmap
                 }
@@ -72,7 +72,7 @@ class Utilities {
                 var drawable: Drawable? = ContextCompat.getDrawable(context, vectorDrawableId)
                 drawable?.tint(context, tintColorResId)
                 if (drawable is VectorDrawable) {
-                    return Utilities.getBitmap(vectorDrawable = drawable)
+                    return Util.getBitmap(vectorDrawable = drawable)
                 }
             }
             throw IllegalArgumentException("unsupported drawable type")
