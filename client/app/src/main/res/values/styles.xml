@@ -68,4 +68,10 @@
         <item name="android:layout_height">2dp</item>
         <item name="android:layout_width">match_parent</item>
     </style>
+
+    <style name="vSeparator">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_width">2dp</item>
+    </style>
 </resources>

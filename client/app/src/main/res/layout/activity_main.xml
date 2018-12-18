@@ -80,7 +80,7 @@
                     style="@style/bodyTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/vertical_margin"
+                    android:layout_marginBottom="@dimen/vertical_margin_small"
                     android:text="@{viewModel.permissionMessage}" />
 
                 <android.support.v7.widget.AppCompatTextView
@@ -88,8 +88,7 @@
                     style="@style/activeTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/vertical_margin"
-                    android:layout_marginBottom="@dimen/vertical_margin"
+                    android:layout_marginBottom="@dimen/vertical_margin_small"
                     android:text="@{viewModel.selectedCityName()}" />
 
                 <android.support.v7.widget.AppCompatButton
@@ -97,9 +96,18 @@
                     visibleIf="@{!safeUnbox(viewModel.isPermissionGranted())}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/vertical_margin"
+                    android:layout_marginBottom="@dimen/vertical_margin_small"
                     android:onClick="@{() -> viewModel.handlePermissions()}"
                     android:text="@string/button_enable_permission_title" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/button_pick_city"
+                    visibleIf="@{!safeUnbox(serviceable)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/vertical_margin_small"
+                    android:onClick="@{() -> viewModel.showCityPickerWithResult()}"
+                    android:text="@string/button_open_city_picker" />
 
             </LinearLayout>
 
@@ -171,7 +179,13 @@
                     android:text="@{activeLocationInfo.city.countryCode}" />
 
             </LinearLayout>
-
+            
+            <View
+                style="@style/vSeparator"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"/>
             <View
                 style="@style/separator"
                 app:layout_constraintStart_toStartOf="parent"
