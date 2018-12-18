@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
+import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import com.shafic.challenge.R
 import com.shafic.challenge.common.BaseEvent
@@ -17,6 +18,7 @@ import com.shafic.challenge.common.dialogs.DialogProviderImplementation
 import com.shafic.challenge.data.models.City
 import com.shafic.challenge.databinding.ActivityCityPickerBinding
 import com.shafic.challenge.injection.ViewModelFactory
+import com.shafic.challenge.navigation.coordinators.CityPickerFlowCoordinator
 import com.shafic.challenge.ui.cityPicker.list.CitiesAdapter
 import com.shafic.challenge.ui.cityPicker.list.CityPickerAdapterItem
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -71,8 +73,9 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
         val binding = viewBinding() ?: return
 
         viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(CityPickerViewModel::class.java)
+        viewModel.setFlowCoordinator(CityPickerFlowCoordinator(this))
         setupRecyclerView()
-
+        
         viewModel.getItemsLiveData().observe(this, Observer { updateAdapter(it) })
         viewModel.getIsLoading().observe(this, Observer { binding.isLoading = it ?: false })
         viewModel.getSelectedCity().observe(this, Observer { handleCitySelection(it) })
@@ -89,6 +92,7 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
         val recyclerView = binding.recyclerView
         val adapter = CitiesAdapter(this, viewModel.getItemsLiveData().value ?: arrayListOf())
         recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         recyclerView.adapter = adapter
         adapter.onItemClickListener = this
     }
@@ -104,19 +108,15 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
         val city = city ?: return
         dialogProvider.createAlertSelectionValidation(city = city,
             positiveAction = {
-                finishActivityWithSelectionResult(city)
+                val intent = Intent().apply { 
+                    putExtra(EXTRA_KEY_CITY_CODE, city.code)
+                    putExtra(EXTRA_KEY_COUNTRY_CODE, city.countryCode)
+                }
+                viewModel.finishWithConfirmedSelection(intent)
             },
             negativeAction = {
                 viewModel.cancelSelection()
             })?.show()
-    }
-
-    private fun finishActivityWithSelectionResult(city: City) {
-        val intent = Intent()
-        intent.putExtra(EXTRA_KEY_CITY_CODE, city.code)
-        intent.putExtra(EXTRA_KEY_COUNTRY_CODE, city.countryCode)
-        setResult(SELECTION_RESULT_CODE, intent)
-        finish()
     }
 
     //region

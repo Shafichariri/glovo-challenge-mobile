@@ -57,7 +57,7 @@ class PermissionsActivity : AbstractBaseActivity<ActivityPermissionsBinding>() {
 
     override fun onCreated(savedInstanceState: Bundle?) {
         viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(PermissionsViewModel::class.java)
-        viewModel.setFlowCoordinator(MainFlowCoordinator())
+        viewModel.setFlowCoordinator(MainFlowCoordinator(this))
         startRequest()
     }
 

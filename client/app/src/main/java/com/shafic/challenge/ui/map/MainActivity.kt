@@ -109,7 +109,7 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
         viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(MainActivityViewModel::class.java)
-        viewModel.setFlowCoordinator(MainFlowCoordinator())
+        viewModel.setFlowCoordinator(MainFlowCoordinator(this))
         viewModel.setLocationInformationProvider(RxGeoCoder.LocationInformationProvider(context = this) as RxGeoCoder.LocationInformationInterface)
 
         viewBinding()?.viewModel = viewModel

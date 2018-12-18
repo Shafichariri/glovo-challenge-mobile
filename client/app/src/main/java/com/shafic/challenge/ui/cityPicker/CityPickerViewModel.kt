@@ -2,8 +2,10 @@ package com.shafic.challenge.ui.cityPicker
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.content.Intent
 import com.shafic.challenge.common.base.BaseViewModel
 import com.shafic.challenge.data.models.City
+import com.shafic.challenge.navigation.coordinators.CityPickerFlowProvider
 import com.shafic.challenge.ui.cityPicker.list.CityPickerAdapterItem
 import com.shafic.challenge.ui.cityPicker.useCase.CountriesAndCitiesGroupingUseCase
 import com.shafic.challenge.ui.cityPicker.useCase.CountriesAndCitiesGroupingUseCaseImp
@@ -27,6 +29,11 @@ class CityPickerViewModel : BaseViewModel() {
     private val isLoading: MutableLiveData<Boolean> = MutableLiveData()
     private val selectedCity: MutableLiveData<City?> = MutableLiveData()
     private val error: MutableLiveData<Boolean> = MutableLiveData()
+    private var flow: CityPickerFlowProvider? = null
+
+    fun setFlowCoordinator(flow: CityPickerFlowProvider) {
+        this.flow = flow
+    }
 
     fun getItemsLiveData(): LiveData<MutableList<CityPickerAdapterItem>> {
         return itemsLiveData
@@ -38,6 +45,10 @@ class CityPickerViewModel : BaseViewModel() {
 
     fun getSelectedCity(): LiveData<City?> {
         return selectedCity
+    }
+
+    fun finishWithConfirmedSelection(intent: Intent) {
+        flow?.closeCityPicker(CityPickerActivity.SELECTION_RESULT_CODE, intent)
     }
 
     fun cancelSelection() {
