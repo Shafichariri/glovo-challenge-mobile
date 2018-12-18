@@ -21,6 +21,8 @@
 
     <string name="error">Error</string>
     <string name="server_not_reachable">Seems that the Server Is not reachable, try again?</string>
+    <string name="could_not_load_data">Could not load data</string>
+    <string name="retry_button_title">Retry</string>
     
     <!-- Map Main Activity -->
     <string name="action_bar_title_map">Map</string>

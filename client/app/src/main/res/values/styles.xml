@@ -62,6 +62,12 @@
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:textSize">13sp</item>
     </style>
+
+    <style name="PrimaryButton" parent="AppTheme">
+        <item name="colorButtonNormal">@color/colorPrimary</item>
+        <item name="colorControlHighlight">@color/colorPrimaryDark</item>
+        <item name="android:textColorPrimary">@color/secondaryTextColor</item>
+    </style>
     
     <style name="separator">
         <item name="android:background">@color/colorPrimary</item>

@@ -2,10 +2,9 @@
 <layout>
 
     <data>
-
         <variable
-            name="isLoading"
-            type="Boolean" />
+            name="viewModel"
+            type="com.shafic.challenge.ui.cityPicker.CityPickerViewModel" />
     </data>
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -20,10 +19,36 @@
 
         <android.support.v4.widget.ContentLoadingProgressBar
             style="?android:attr/progressBarStyleLarge"
-            visibleIf="@{safeUnbox(isLoading)}"
+            visibleIfLiveData="@{viewModel.isLoading}"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="center"
             android:indeterminate="true" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            visibleIfLiveData="@{viewModel.connectionFailed}"
+            android:layout_gravity="center_vertical">
+
+            <android.support.v7.widget.AppCompatTextView
+                style="@style/bodyTextStyle"
+                visibleIfLiveData="@{viewModel.connectionFailed}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/vertical_margin"
+                android:text="@string/could_not_load_data" />
+
+            <android.support.v7.widget.AppCompatButton
+                android:theme="@style/PrimaryButton"
+                visibleIfLiveData="@{viewModel.connectionFailed}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:onClick="@{() -> viewModel.loadData()}"
+                android:text="@string/retry_button_title" />
+        </LinearLayout>
     </FrameLayout>
 </layout>

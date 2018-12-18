@@ -27,6 +27,7 @@ class CityPickerViewModel : BaseViewModel() {
 
     private val itemsLiveData: MutableLiveData<MutableList<CityPickerAdapterItem>> = MutableLiveData()
     private val isLoading: MutableLiveData<Boolean> = MutableLiveData()
+    private val connectionFailed: MutableLiveData<Boolean> = MutableLiveData()
     private val selectedCity: MutableLiveData<City?> = MutableLiveData()
     private val error: MutableLiveData<Boolean> = MutableLiveData()
     private var flow: CityPickerFlowProvider? = null
@@ -43,6 +44,10 @@ class CityPickerViewModel : BaseViewModel() {
         return isLoading
     }
 
+    fun getConnectionFailed(): LiveData<Boolean> {
+        return connectionFailed
+    }
+    
     fun getSelectedCity(): LiveData<City?> {
         return selectedCity
     }
@@ -67,11 +72,13 @@ class CityPickerViewModel : BaseViewModel() {
         }
     }
 
-    fun reset() {
+    fun onConnectionFailure() {
         isLoading.value = false
+        connectionFailed.value = true
     }
 
     fun loadData() {
+        connectionFailed.value = false
         isLoading.value = true
         val disposable = zipAndGroupUseCase.zip(groupingUseCase)
             .subscribeOn(Schedulers.io())

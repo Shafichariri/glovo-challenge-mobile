@@ -3,14 +3,16 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-
+    <color name="white">@android:color/white</color>
+    
     <color name="defaultTextColor">#222222</color>
+    <color name="secondaryTextColor">@color/white</color>
     <color name="activeColor">@color/colorAccent</color>
 
     <!-- Toolbar colors -->
     <color name="toolbarTextColor">@color/defaultTextColor</color>
-    <color name="toolbarBackgroundColor">@android:color/white</color>
-    <color name="controlDefaultColor">@android:color/white</color>
+    <color name="toolbarBackgroundColor">@color/white</color>
+    <color name="controlDefaultColor">@color/white</color>
 
 
     <color name="disabled_pin_color">#444444</color>

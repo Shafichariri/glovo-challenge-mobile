@@ -1,5 +1,7 @@
 package com.shafic.challenge.common
 
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.Observer
 import android.databinding.BindingAdapter
 import android.support.annotation.ColorRes
 import android.support.annotation.DimenRes
@@ -30,5 +32,15 @@ class CustomBindingAdapter {
         fun setViewElevation(view: AppCompatImageView, @DimenRes dimenRes: Int) {
             ViewCompat.setElevation(view, view.resources.getDimension(dimenRes))
         }
+
+        @JvmStatic
+        @BindingAdapter(value = "visibleIfLiveData")
+        fun setVisibleIfLiveData(view: View, visible: LiveData<Boolean>) {
+            val activity = view.parentActivity() ?: return
+            visible.observe(activity, Observer {
+                view.visibility = if (it == true) View.VISIBLE else View.GONE
+            })
+        }
+        
     }
 }

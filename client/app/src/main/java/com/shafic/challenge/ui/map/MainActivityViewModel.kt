@@ -81,10 +81,16 @@ class MainActivityViewModel : BaseViewModel() {
         setupLocationChangedObservable()
     }
 
+    fun loadDataIfNeeded() {
+        if (cities.isEmpty()) {
+            loadCities()
+        }
+    }
+
     fun reset() {
         isLoadingLiveData.value = false
     }
-    
+
     fun readyLiveData(): LiveData<Boolean> {
         return readyLiveData
     }
@@ -292,8 +298,8 @@ class MainActivityViewModel : BaseViewModel() {
         val regionInfo = RegionInfo(zoom, center, visibleRegionPolygon)
         regionSubject.onNext(regionInfo)
     }
-    
+
     fun isAreaVisibleEnough(zoom: Float): Boolean {
-        return ZoomContext.isAreaVisibleEnough(zoom)    
+        return ZoomContext.isAreaVisibleEnough(zoom)
     }
 }

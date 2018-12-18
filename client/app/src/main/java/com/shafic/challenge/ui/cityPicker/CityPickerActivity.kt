@@ -23,6 +23,8 @@ import com.shafic.challenge.ui.cityPicker.list.CitiesAdapter
 import com.shafic.challenge.ui.cityPicker.list.CityPickerAdapterItem
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import java.util.concurrent.TimeUnit
 
 class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
     BaseAdapter.OnItemClickListener<CityPickerAdapterItem> {
@@ -56,8 +58,9 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
 
     private lateinit var viewModel: CityPickerViewModel
     private val compositeDisposable = CompositeDisposable()
+    private var networkErorrDisposable: Disposable? = null
     private val dialogProvider: DialogProvider by lazy { DialogProviderImplementation(context = this) }
-
+    
     override val layoutId: Int
         get() = R.layout.activity_city_picker
 
@@ -66,22 +69,28 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
     }
 
     override fun onCreated(savedInstanceState: Bundle?) {
-        setupNetworkErrorListener()
-        actionBar?.title = resources.getString(R.string.action_bar_title_city_picker)
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-
         val binding = viewBinding() ?: return
 
         viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(CityPickerViewModel::class.java)
+        binding.viewModel = viewModel
         viewModel.setFlowCoordinator(CityPickerFlowCoordinator(this))
         setupRecyclerView()
         
         viewModel.getItemsLiveData().observe(this, Observer { updateAdapter(it) })
-        viewModel.getIsLoading().observe(this, Observer { binding.isLoading = it ?: false })
         viewModel.getSelectedCity().observe(this, Observer { handleCitySelection(it) })
         viewModel.loadData()
     }
 
+    override fun onResume() {
+        setupNetworkErrorListener()
+        super.onResume()
+    }
+
+    override fun onPause() {
+        networkErorrDisposable?.dispose()
+        super.onPause()
+    }
+    
     override fun onDestroy() {
         compositeDisposable.dispose()
         super.onDestroy()
@@ -126,19 +135,19 @@ class CityPickerActivity : AbstractBaseActivity<ActivityCityPickerBinding>(),
     //endregion
 
     private fun setupNetworkErrorListener() {
-        val disposable = RxBus.events()
+        networkErorrDisposable = RxBus.events()
+            .debounce(200, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ event: BaseEvent? ->
                 when (event) {
                     is BaseEvent.ConnectionFailed -> {
                         //Error Info: val error = event.error
-                        viewModel.reset()
+                        viewModel.onConnectionFailure()
                         dialogProvider.createNetworkErrorDialog { viewModel.loadData() }?.show()
                     }
                 }
             }, { throwable: Throwable? ->
                 throwable?.printStackTrace()
             })
-        compositeDisposable.add(disposable)
     }
 }

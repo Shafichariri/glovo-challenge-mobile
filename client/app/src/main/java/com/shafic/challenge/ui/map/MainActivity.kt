@@ -31,6 +31,7 @@ import com.shafic.challenge.ui.permission.PermissionsActivity
 import com.vanniktech.rxpermission.RealRxPermission
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
 import java.util.concurrent.TimeUnit
 
@@ -58,6 +59,8 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     private lateinit var viewModel: MainActivityViewModel
     private val dialogSubject: BehaviorSubject<DialogType> = BehaviorSubject.create()
     private val compositeDisposable = CompositeDisposable()
+    private var networkErorrDisposable: Disposable? = null
+    
     private val dialogProvider: DialogProvider by lazy { DialogProviderImplementation(context = this) }
 
     override val pinIcon: BitmapDescriptor by lazy {
@@ -103,11 +106,6 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     }
 
     override fun onCreated(savedInstanceState: Bundle?) {
-        setupNetworkErrorListener()
-
-        actionBar?.title = resources.getString(R.string.action_bar_title_landing)
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-
         viewModel = ViewModelProviders.of(this, ViewModelFactory()).get(MainActivityViewModel::class.java)
         viewModel.setFlowCoordinator(MainFlowCoordinator(this))
         viewModel.setLocationInformationProvider(RxGeoCoder.LocationInformationProvider(context = this) as RxGeoCoder.LocationInformationInterface)
@@ -118,6 +116,17 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
         setupDialogSubject()
     }
 
+    override fun onResume() {
+        super.onResume()
+        setupNetworkErrorListener()
+        viewModel.loadDataIfNeeded()
+    }
+    
+    override fun onPause() {
+        networkErorrDisposable?.dispose()
+        super.onPause()
+    }
+    
     override fun onDestroy() {
         compositeDisposable.dispose()
         super.onDestroy()
@@ -196,9 +205,6 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
                 requestMapDataUpdate()
             }
         })
-        viewModel.isLoading().observe(this, android.arch.lifecycle.Observer { isLoading ->
-            viewBinding()?.isLoading = isLoading ?: false
-        })
         viewModel.getGoeCoderErrorMessage().observe(this, android.arch.lifecycle.Observer { message ->
             this.viewBinding()?.serviceable = false
 
@@ -276,7 +282,8 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
     }
 
     private fun setupNetworkErrorListener() {
-        val disposable = RxBus.events()
+        networkErorrDisposable = RxBus.events()
+            .debounce(200, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ event: BaseEvent? ->
                 when (event) {
@@ -289,6 +296,5 @@ class MainActivity : AbstractMapActivity<ActivityMainBinding>(), OnMapReadyCallb
             }, { throwable: Throwable? ->
                 throwable?.printStackTrace()
             })
-        compositeDisposable.add(disposable)
     }
 }

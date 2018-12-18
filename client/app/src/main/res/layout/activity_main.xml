@@ -20,10 +20,6 @@
             type="Boolean" />
 
         <variable
-            name="isLoading"
-            type="Boolean" />
-
-        <variable
             name="activeLocationInfo"
             type="com.shafic.challenge.data.presentation.ServiceableLocation.Serviceable" />
     </data>
@@ -50,7 +46,7 @@
 
         <android.support.v4.widget.ContentLoadingProgressBar
             style="?android:attr/progressBarStyleLarge"
-            visibleIf="@{safeUnbox(isLoading)}"
+            visibleIfLiveData="@{viewModel.isLoading()}"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="end|bottom"
@@ -98,7 +94,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/vertical_margin_small"
                     android:onClick="@{() -> viewModel.handlePermissions()}"
-                    android:text="@string/button_enable_permission_title" />
+                    android:text="@string/button_enable_permission_title"
+                    android:theme="@style/PrimaryButton" />
 
                 <android.support.v7.widget.AppCompatButton
                     android:id="@+id/button_pick_city"
@@ -107,7 +104,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/vertical_margin_small"
                     android:onClick="@{() -> viewModel.showCityPickerWithResult()}"
-                    android:text="@string/button_open_city_picker" />
+                    android:text="@string/button_open_city_picker"
+                    android:theme="@style/PrimaryButton" />
 
             </LinearLayout>
 
@@ -179,13 +177,14 @@
                     android:text="@{activeLocationInfo.city.countryCode}" />
 
             </LinearLayout>
-            
+
             <View
                 style="@style/vSeparator"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"/>
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <View
                 style="@style/separator"
                 app:layout_constraintStart_toStartOf="parent"
